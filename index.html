@@ -126,6 +126,9 @@ form.add .btn{justify-self:start}
 .chip button{border:0;background:none;color:var(--red);cursor:pointer;font-size:18px;line-height:1;min-width:28px;min-height:28px}
 .fams{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:12px}
 .fbox{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:14px}
+.rhrow{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-items:center}
+.rhbtn{min-height:36px;border-radius:999px;border:1px dashed var(--vio2);background:none;color:var(--vio2);font:600 13px Fredoka,sans-serif;padding:0 12px;cursor:pointer}
+.sug{min-height:36px;border-radius:999px;border:0;background:var(--vio2);color:#fff;font:600 13px Fredoka,sans-serif;padding:0 12px;cursor:pointer}
 .fbox b{display:block;color:var(--vio2);font-size:15px}
 footer{font-size:13px;color:var(--soft)}
 dialog{border:0;padding:0;border-radius:26px;width:min(460px,calc(100vw - 32px));background:var(--card);color:var(--ink);box-shadow:0 30px 80px rgba(0,0,0,.45)}
@@ -621,15 +624,37 @@ $('bars').addEventListener('change',()=>{renderBarDots();if(fam){famTxt();render
 $('lvl').addEventListener('change',()=>{if(fam)renderStrip()});
 
 /* ---------- word wall ---------- */
+const dupKey=w=>(AR.test(w)?translit(w):norm(w)).replace(/([a-z0-9])\1+/g,'$1');
+const findDup=w=>allWords().find(x=>dupKey(x.w)===dupKey(w));
+let aiOn=false;const rh={};
 function renderWall(){
   const recent=shared.slice(0,40);
   $('chips').innerHTML=recent.map(s=>'<span class="chip">'+esc(s.w)+(s.g?' <i>'+esc(s.g)+'</i>':'')+(isOwner&&s.id?'<button data-del="'+esc(s.id)+'" aria-label="Remove '+esc(s.w)+'">×</button>':'')+'</span>').join('');
   const f=families(),keys=Object.keys(f).sort((a,b)=>f[b].length-f[a].length);
-  $('fams').innerHTML=keys.filter(k=>f[k].length>=2).map(k=>'<div class="fbox"><b>-'+esc(k)+' · '+f[k].length+'</b>'+f[k].map(x=>esc(x.w)).join(', ')+(f[k].length<3?' <span class="muted">(needs 3 to play)</span>':'')+'</div>').join('');
+  $('fams').innerHTML=keys.filter(k=>f[k].length>=(aiOn?1:2)).map(k=>{const h=rh[k];
+    return '<div class="fbox"><b>-'+esc(k)+' · '+f[k].length+'</b>'+f[k].map(x=>esc(x.w)).join(', ')+(f[k].length<3?' <span class="muted">(needs '+(3-f[k].length)+' more to play)</span>':'')
+    +(aiOn?'<div class="rhrow">'+(h&&h.items?h.items.map(x=>'<button class="sug" data-sw="'+esc(x.w)+'" data-sg="'+esc(x.g)+'" title="'+esc(x.g)+'">+ '+esc(x.w)+'</button>').join('')+(h.items.length?'':'<span class="muted">No new ideas this time.</span>'):'')
+      +(h&&h.err?'<span class="muted">'+esc(h.err)+'</span>':'')
+      +'<button class="rhbtn" data-rh="'+esc(k)+'"'+(h&&h.loading?' disabled':'')+'>'+(h&&h.loading?'Thinking…':h&&h.items?'More rhymes':'Find rhymes')+'</button></div>':'')+'</div>'}).join('');
 }
+$('fams').addEventListener('click',async e=>{
+  const sg=e.target.closest('[data-sw]');
+  if(sg){$('w').value=sg.dataset.sw;$('g').value=sg.dataset.sg||'';$('add').requestSubmit();const k=ending(sg.dataset.sw);if(rh[k]&&rh[k].items)rh[k].items=rh[k].items.filter(x=>x.w!==sg.dataset.sw);return}
+  const b=e.target.closest('[data-rh]');if(!b||!aiOn)return;
+  const k=b.dataset.rh,words=(families()[k]||[]).map(x=>x.w).filter(w=>/^[A-Za-z0-9]{2,20}$/.test(w));
+  if(!words.length){rh[k]={err:'Rhyme ideas work for Latin-letter words for now.'};renderWall();return}
+  rh[k]={loading:true,items:rh[k]&&rh[k].items};renderWall();
+  try{const r=await fetch(AI_URL,{method:'POST',headers:sHdr(),body:JSON.stringify({sound:k,words})});
+    const j=await r.json();if(!r.ok)throw new Error(j&&j.error||r.status);
+    const got=(Array.isArray(j.words)?j.words:[]).filter(x=>x&&VALID.test(String(x.w))&&!findDup(String(x.w))).map(x=>({w:String(x.w),g:String(x.g||'').slice(0,40)}));
+    rh[k]={items:got};
+  }catch(err){rh[k]={err:String(err.message||err).includes('429')?'Too many requests — try again in a bit.':'Rhyme helper is busy, try again.'}}
+  renderWall();
+});
 $('chips').addEventListener('click',async e=>{const id=e.target.dataset&&e.target.dataset.del;if(!id||!col)return;try{await col.doc(id).delete()}catch(err){$('wallHint').textContent='Could not remove that word.'}});
 const SUPA={url:'https://nqsibygdyxgzwtlpbchz.supabase.co',key:'sb_publishable_XIL4_iE7PsrqMK0kX3A1_A_Xh5O3hfd'};
 const remote=!!(SUPA.url&&SUPA.key);
+const AI_URL=remote?SUPA.url+'/functions/v1/rhyme':'';
 const sHdr=()=>{const h={apikey:SUPA.key,'Content-Type':'application/json'};if(SUPA.key.startsWith('eyJ'))h.Authorization='Bearer '+SUPA.key;return h};
 function addedMsg(w){const e=ending(w),n=(families()[e]||[]).length;return n>=3?'Added! It’s in the <b>-'+esc(e)+'</b> rhymes now.':'Added! The <b>-'+esc(e)+'</b> sound needs '+(3-n)+' more word'+(3-n>1?'s':'')+' to come up in the freestyle.'}
 async function loadRemote(){
@@ -647,7 +672,7 @@ function bindAdd(form,wi,gi,hint,btn,onDone){
     e.preventDefault();if(busy)return;
     const w=$(wi).value.trim(),g=$(gi).value.trim().slice(0,40);
     if(!VALID.test(w)){H.textContent='One word only, 2 to 20 letters: Latin (with 3, 7, 9) or Arabic.';return}
-    if(allWords().some(x=>norm(x.w)===norm(w))){H.textContent='That word is already on the wall.';return}
+    {const d=findDup(w);if(d){H.textContent=d.w===w?'That word is already on the wall.':'Already on the wall as “'+d.w+'”.';return}}
     busy=true;$(btn).disabled=true;H.textContent='Saving…';
     await Promise.race([dbReady,new Promise(r=>setTimeout(r,10000))]);
     let ok=false;
@@ -715,7 +740,7 @@ renderWall();
 
 
 const localMode=typeof window.claude==='undefined'||!window.claude||typeof window.claude.use!=='function';
-if(localMode&&remote){readyFn();$('wallHint').textContent='Loading shared words…';loadRemote();setInterval(()=>{if(!document.hidden)loadRemote()},30000)}
+if(localMode&&remote){fetch(AI_URL,{headers:sHdr()}).then(r=>r.ok?r.json():null).then(j=>{if(j&&j.ok){aiOn=true;renderWall()}}).catch(()=>{});readyFn();$('wallHint').textContent='Loading shared words…';loadRemote();setInterval(()=>{if(!document.hidden)loadRemote()},30000)}
 else if(localMode){
   readyFn();$('shareNote').textContent='Words you add are saved in this browser.';
   try{const a=JSON.parse(localStorage.getItem('ft-words')||'[]');if(Array.isArray(a))shared=a.filter(x=>x&&typeof x.w==='string'&&VALID.test(x.w)).map(x=>({w:x.w,g:typeof x.g==='string'?x.g.slice(0,40):'',at:+x.at||0}))}catch(e){}
