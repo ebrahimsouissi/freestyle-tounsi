@@ -72,6 +72,12 @@ h1 b{font-weight:400;background:var(--red);padding:0 .2em;border-radius:10px;dis
 .lamp.on.one::after{border-color:var(--red)}
 @keyframes lamp{from{transform:scale(1.25)}}
 @keyframes ring{from{opacity:.9;transform:scale(.9)}to{opacity:0;transform:scale(1.6)}}
+.barbox{background:rgba(3,30,60,.45);border-radius:20px;padding:10px 14px 14px}
+.barlbl{font-size:13px;opacity:.85;margin-bottom:8px;font-weight:600}
+.bars{display:grid;grid-template-columns:repeat(var(--n,4),minmax(0,1fr));gap:6px}
+.bd{height:34px;border-radius:10px;background:rgba(255,255,255,.12);display:grid;place-items:center;font:400 18px var(--D);color:rgba(255,255,255,.55)}
+.bd.done{background:rgba(255,255,255,.3);color:#fff}
+.bd.on{background:#fff;color:#063a73;animation:lamp .25s ease-out}
 .seg{display:grid;grid-template-columns:1fr 1fr;background:rgba(3,30,60,.45);border-radius:999px;padding:4px}
 .seg button{min-height:44px;border:0;border-radius:999px;background:none;color:#fff;font:600 16px Fredoka,sans-serif;cursor:pointer}
 .seg button[aria-pressed=true]{background:#fff;color:#063a73}
@@ -142,6 +148,39 @@ dialog::backdrop{background:rgba(2,16,30,.72)}
 .tcard .tnext{background:linear-gradient(180deg,#3a9be8,#0b5fb0);color:#fff;box-shadow:0 4px 0 #063a73}
 .tcard .tskip{margin-right:auto;background:none;border:0;color:var(--soft);cursor:pointer;font:inherit;font-size:14px;min-height:44px;padding:0 6px;text-decoration:underline}
 .howto{position:relative;background:rgba(255,255,255,.16);color:#fff;border:0;border-radius:999px;min-height:40px;padding:0 16px;font:600 15px Fredoka,sans-serif;cursor:pointer}
+.sp{--card:#181818;--line:#2a2a2a;--ink:#fff;--soft:#b3b3b3;--bg:#121212;background:#121212;color:#fff}
+.spHead{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 16px}
+.sp .beats{display:block;margin:6px 0 18px}
+.shelfT{font:600 22px Fredoka,sans-serif;margin:22px 0 10px;color:#fff}
+.shelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:18px}
+.sc{position:relative;background:#181818;border-radius:10px;padding:12px 12px 16px;cursor:pointer;transition:background .2s;outline:none}
+.sc:hover,.sc:focus-visible{background:#282828}.sc:focus-visible{box-shadow:0 0 0 3px #ffd23f}
+.cover{container-type:inline-size;position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;background:linear-gradient(135deg,var(--c1),var(--c2));box-shadow:0 8px 24px rgba(0,0,0,.5);margin-bottom:12px}
+.cover::before{content:"";position:absolute;width:150%;aspect-ratio:1;right:-75%;bottom:-75%;border-radius:50%;background:repeating-radial-gradient(circle,rgba(0,0,0,.28) 0 2px,transparent 2px 7px);opacity:.55}
+.cover b{position:absolute;left:9%;top:7%;right:6%;font:400 clamp(18px,16cqw,48px)/.92 var(--D);overflow-wrap:anywhere;color:#fff;text-shadow:0 3px 0 rgba(0,0,0,.25);max-width:80%}
+.cover small{position:absolute;left:12px;bottom:10px;font:700 12px Fredoka,sans-serif;color:rgba(255,255,255,.85);letter-spacing:.3px}
+.spPlay{position:absolute;right:10px;bottom:10px;width:48px;height:48px;border-radius:50%;border:0;background:#1ed760;color:#000;font-size:18px;display:grid;place-items:center;cursor:pointer;box-shadow:0 8px 16px rgba(0,0,0,.35);opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s}
+.sc:hover .spPlay,.sc:focus-within .spPlay,.sc.playing .spPlay{opacity:1;transform:none}
+.spPlay:hover{transform:scale(1.06)!important;background:#3be477}
+.sc strong{display:flex;align-items:center;gap:8px;font:600 16px Fredoka,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sc>span{display:block;font-size:14px;color:#b3b3b3;margin-top:2px;line-height:1.35}
+.sc[aria-pressed=true] strong{color:#1ed760}
+.eq{display:inline-flex;align-items:flex-end;gap:2px;height:14px;flex:none}.eq i{width:3px;height:30%;background:#1ed760;border-radius:1px}
+.sc.playing .eq i{animation:eq .8s ease-in-out infinite alternate}.eq i:nth-child(2){animation-delay:-.4s!important}.eq i:nth-child(3){animation-delay:-.2s!important}
+@keyframes eq{from{height:20%}to{height:100%}}
+.sp .own{background:#181818;border:1px solid #2a2a2a}
+.sp .own .btn.ghost{color:#fff}
+.sp .chip{background:#282828;border-color:#333;color:#fff}
+.sp input[type=text],.sp input[type=number]{background:#242424;border-color:#3a3a3a;color:#fff}
+.sp .gold{background:#1ed760;color:#000;box-shadow:none;border-radius:999px}
+.np{position:fixed;left:8px;right:8px;bottom:8px;z-index:30;display:grid;grid-template-columns:52px minmax(0,1fr) auto;align-items:center;gap:12px;background:rgba(24,24,24,.96);backdrop-filter:blur(10px);color:#fff;border-radius:12px;padding:10px 12px 10px 10px;box-shadow:0 10px 30px rgba(0,0,0,.45);max-width:720px;margin:0 auto;overflow:hidden}
+.npProg{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.12)}.npProg i{display:block;height:100%;width:0;background:#1ed760}
+.npCover{width:52px;height:52px;border-radius:6px;background:linear-gradient(135deg,var(--c1),var(--c2));display:grid;place-items:center;font:400 20px var(--D)}
+.npTxt strong{display:block;font:600 15px Fredoka,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.npTxt span{font-size:13px;color:#b3b3b3}
+.npBtn{width:48px;height:48px;border-radius:50%;border:0;background:#fff;color:#000;font-size:18px;cursor:pointer}
+.npBtn:hover{transform:scale(1.06)}.npBtn:focus-visible{outline:3px solid #ffd23f;outline-offset:2px}
+body{padding-bottom:92px}
+@media(max-width:600px){.shelf{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.sc{padding:8px 8px 12px}.spPlay{width:40px;height:40px;font-size:15px;opacity:1;transform:none}.sc>span{font-size:13px}}
 @media(max-width:820px){.door,.grid2{grid-template-columns:minmax(0,1fr)}.tile{min-height:300px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
@@ -186,10 +225,11 @@ dialog::backdrop{background:rgba(2,16,30,.72)}
     <div class="side">
       <div class="seg" role="group" aria-label="Mode"><button id="mFree" aria-pressed="true">Free style</button><button id="mChal" aria-pressed="false">Challenge</button></div>
       <div class="lamps" aria-hidden="true"><div class="lamp one">1</div><div class="lamp">2</div><div class="lamp">3</div><div class="lamp">4</div></div>
+      <div class="barbox"><div class="barlbl" id="barLbl">Bars on this sound</div><div class="bars" id="barDots" aria-hidden="true"></div></div>
       <div class="hud" id="hud" hidden>
         <div><b id="hScore">0</b><span>score</span></div>
         <div class="combo"><b id="hStreak">0</b><span>streak</span></div>
-        <div><b id="hBar">–</b><span>bar</span></div>
+        <div><b id="hBar">–</b><span>word</span></div>
       </div>
       <button class="btn hit" id="hitBtn" hidden disabled>Got it!</button>
       <div class="ctl">
@@ -202,6 +242,7 @@ dialog::backdrop{background:rgba(2,16,30,.72)}
         <label class="sel" id="barsWrap">New sound every
           <select id="bars"><option value="2">2 bars</option><option value="4" selected>4 bars</option><option value="8">8 bars</option></select>
         </label>
+        <label class="sel">Level <select id="lvl"><option value="8">Easy · word every 2 bars</option><option value="4" selected>Normal · word every bar</option><option value="2">Hard · word every 2 beats</option></select></label>
         <label class="sel">Volume <input type="range" id="vol" min="0" max="1" step="0.05" value="0.8" aria-label="Volume"></label>
       </div>
       <div class="stat" id="stat">Beat: Boom bap · 90 BPM</div>
@@ -209,9 +250,9 @@ dialog::backdrop{background:rgba(2,16,30,.72)}
   </div>
 </section>
 
-<section class="band"><div class="wrap">
-  <h2>Choose your beat</h2>
-  <p class="muted">Five beats built right here in the style of the classics. Want a famous instrumental? Load your own MP3 below.</p>
+<section class="band sp"><div class="wrap">
+  <div class="spHead"><h2>Choose your beat</h2><span class="muted">14 beats · made in your browser</span></div>
+  <p class="muted">Tap a cover to pick it, or hit the round play button to start right away. Want a famous instrumental? Load your own MP3 or find one on YouTube below.</p>
   <div class="beats" id="beats"></div>
   <div class="own">
     <strong>Use your own beat</strong>
@@ -253,6 +294,12 @@ dialog::backdrop{background:rgba(2,16,30,.72)}
   </div>
 </div></section>
 
+<div class="np" id="np" aria-label="Now playing">
+  <div class="npProg"><i id="npProg"></i></div>
+  <div class="npCover" id="npCover"></div>
+  <div class="npTxt"><strong id="npName">Boom bap</strong><span id="npSub">Freestyle Tounsi · 90 BPM</span></div>
+  <button class="npBtn" id="npPlay" aria-label="Play">▶</button>
+</div>
 <footer class="band" style="padding-top:0"><div class="wrap">Starter words are in Tunisian Arabizi with French meanings. Words added by visitors are shared with everyone who opens this page. Challenge mode is honest-play: tap “Got it!” (or press G) when you really used the word in that bar.</div></footer>
 
 <script>
@@ -266,7 +313,7 @@ const BASE=[["dar","maison"],["nhar","jour"],["bhar","mer"],["nar","feu"],["far"
 ["s7ab","les amis"],["bab","porte"],["ktab","livre"],["klab","chiens"],["chbab","jeunesse"],["jwab","réponse"],
 ["zouz","deux"],["louz","amandes"],["nfouz","je gagne"],["3jouz","vieille"],["ijouz","ça passe"],
 ["zin","beauté"],["mnin","d'où"],["3ichrin","vingt"],["msakin","pauvres"],["khamsin","cinquante"],["lithnin","lundi"],
-["barra","dehors"],["kora","foot"],["mara","femme"],["9ra","il a étudié"],["zyara","visite"]];
+["s7ar","magie"],["ghbar","poussière"],["dinar","dinar"],["zhar","chance"],["nwar","fleurs"],["jar","voisin"],["kar","bus"],["chbik","qu'est-ce que t'as"],["n7ebbek","je t'aime"],["nchoufek","je te vois"],["ghirek","à part toi"],["wejhek","ton visage"],["rassek","ta tête"],["3omrek","ta vie / jamais"],["ma3andech","je n'ai pas"],["mafamech","il n'y a pas"],["rsoum","dessins animés"],["n7oum","je rôde"],["ma7roum","privé"],["7kaya","histoire"],["bniya","fille"],["lghaya","le top"],["nchouf","je vois"],["khouf","peur"],["dhrouf","circonstances"],["sfouf","rangées"],["ma3rouf","connu"],["malouf","malouf"],["khouk","ton frère"],["bouk","ton père"],["3douk","ton ennemi"],["ychoufouk","ils te voient"],["ya3rfouk","ils te connaissent"],["barra","dehors"],["kora","foot"],["mara","femme"],["9ra","il a étudié"],["zyara","visite"]];
 
 
 const $=id=>document.getElementById(id);
@@ -307,6 +354,12 @@ function allWords(){
 function families(){const f={};for(const x of allWords()){(f[ending(x.w)]??=[]).push(x)}return f}
 let fam=null,queue=[],cur=null,barsOnFam=0;
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+function renderBarDots(){
+  const n=limit(),cur=fam?barsOnFam:0;
+  $('barDots').style.setProperty('--n',n);
+  $('barDots').innerHTML=Array.from({length:n},(_,i)=>'<div class="bd'+(i+1===cur?' on':i+1<cur?' done':'')+'">'+(i+1)+'</div>').join('');
+  $('barLbl').textContent=cur?'Bar '+cur+' of '+n+' on -'+fam:'Bars on this sound: count to '+n;
+}
 function pickFam(){
   const f=families(),keys=Object.keys(f).filter(k=>f[k].length>=3&&k!==fam);
   fam=keys[Math.random()*keys.length|0];queue=shuffle(f[fam]);barsOnFam=0;
@@ -322,28 +375,39 @@ function showCard(big,small,cls){
   if(small!=null){const b=document.createElement('div');b.className='gloss';b.textContent=small||' ';d.appendChild(b)}
   box.appendChild(d);
 }
+let curBeat=0,barIdx=-1,wordStart=-1,wordDur=1;
+const W=()=>+$('lvl').value;
+function newBar(){if(!fam||barsOnFam>=limit())pickFam();barsOnFam++;famTxt();renderBarDots()}
+function famTxt(){$('fam').textContent='Rhyme on -'+fam+' · bar '+barsOnFam+'/'+limit()}
 function renderStrip(){
-  const left=limit()-barsOnFam,ups=queue.slice(0,Math.max(0,Math.min(3,left)));
+  const left=Math.floor((limit()-barsOnFam)*4/W()+(W()===2&&curBeat===0?1:0)),ups=queue.slice(0,Math.max(0,Math.min(3,left)));
   $('strip').innerHTML='<small>Up next</small>'+ups.map(x=>'<span class="up" dir="auto">'+esc(x.w)+'</span>').join('')+(ups.length<3?'<span class="up new">new sound</span>':'');
 }
 function nextWord(forceFam){
-  if(!fam||forceFam||barsOnFam>=limit())pickFam();
+  if(forceFam||!fam){pickFam();barsOnFam=1;renderBarDots()}
   if(!queue.length)queue=shuffle(families()[fam].filter(x=>!cur||x.w!==cur.w));
-  cur=queue.shift();barsOnFam++;
+  cur=queue.shift();
   if(!queue.length)queue=shuffle(families()[fam].filter(x=>x.w!==cur.w));
-  showCard(cur.w,cur.g);
-  $('fam').textContent='Rhyme on -'+fam+' · '+barsOnFam+'/'+limit();
-  renderStrip();
+  showCard(cur.w,cur.g);famTxt();renderStrip();
 }
 
 /* ---------- audio ---------- */
 const mid=m=>440*2**((m-69)/12);
 const STYLES=[
-{id:'boombap',name:'Boom bap',sub:'90s New York feel · 90 BPM',bpm:90,swing:.16,kick:'x.....x...x.....',snare:'....x.......x...',hat:'x.x.x.x.x.x.x.x.',open:'..............x.',chords:[[53,56,60,63],[51,55,58,62]],bass:[41,39],inst:'keys'},
-{id:'trap',name:'Trap',sub:'Atlanta bounce · 140 BPM',bpm:140,swing:0,kick:'x......x..x.....',snare:'........x.......',hat:'x.xxx.x.x.xxx.xx',roll:[13,14,15],chords:[[57,60,64],[53,57,60],[55,59,62],[52,55,59]],bass:[33,29,31,28],b808:1,inst:'bell'},
-{id:'drill',name:'Drill',sub:'UK / NY slide · 142 BPM',bpm:142,swing:0,kick:'x.........x.....',snare:'........x..x....',hat:'x..x..x...x..x..',chords:[[56,59,63],[54,58,61]],bass:[32,30],b808:1,glide:5,inst:'pad'},
-{id:'mezoued',name:'Mezoued',sub:'Tounsi darbouka · 100 BPM',bpm:100,swing:.08,doum:'x.......x.......',tek:'..x...x.....x...',ghost:'.x.x.x.x.x.x.x.x',mel:[[74,0,72,70,69,0,70,0,69,0,67,0,66,0,67,0],[66,0,67,0,69,0,66,0,63,0,62,0,63,0,62,0]],bass:[38,38]},
-{id:'lofi',name:'Lo-fi',sub:'Chill late-night · 80 BPM',bpm:80,swing:.2,kick:'x......x..x.....',rim:'....x.......x...',hat:'..x...x...x...x.',chords:[[60,64,67,71],[57,60,64,67],[62,65,69,72],[55,59,62,65]],bass:[36,33,38,31],inst:'keys',vinyl:1}];
+{id:'boombap',cat:'boom',name:'Boom bap',sub:'Classic New York · 90 BPM',bpm:90,swing:.16,kick:'x.....x...x.....',snare:'....x.......x...',hat:'x.x.x.x.x.x.x.x.',open:'..............x.',chords:[[53,56,60,63],[51,55,58,62]],bass:[41,39],inst:'keys'},
+{id:'bbjazz',cat:'boom',name:'Dusty Jazz',sub:'Boom bap · jazzy keys, walking bass · 88 BPM',bpm:88,swing:.22,kick:'x.......x.x.....',snare:'....x.......x...',hat:'x.x.x.x.x.x.x.x.',open:'......x.......x.',chords:[[62,65,69,72,76],[55,59,65,69,71]],inst:'keys',bline:[[38,0,0,0,41,0,0,0,45,0,0,0,48,0,47,0],[43,0,0,0,47,0,0,0,50,0,0,0,45,0,44,0]]},
+{id:'bbdark',cat:'boom',name:'Dark Piano',sub:'Boom bap · grimy minor stabs · 84 BPM',bpm:84,swing:.12,kick:'x..x......x..x..',snare:'....x.......x...',hat:'x.x.x.x.x.x.x.x.',stabs:'x.....x...x.....',chords:[[50,53,57,62],[48,51,55,60],[46,50,53,58],[45,48,52,57]],bass:[26,24,22,21]},
+{id:'bbgold',cat:'boom',name:'Golden Era',sub:'Boom bap · horn stabs, crispy drums · 94 BPM',bpm:94,swing:.14,kick:'x.....x.x.......',snare:'....x.......x...',hat:'x.x.x.x.x.x.x.x.',open:'..............x.',brass:[[67,0,0,70,0,0,0,0,0,0,0,0,0,0,0,0],[65,0,0,63,0,0,0,0,0,0,0,0,62,0,0,0]],bass:[43,41]},
+{id:'bbtn',cat:'boom',name:'Boom Bap Tounsi',sub:'Boom bap · darbouka + hijaz piano · 92 BPM',bpm:92,swing:.1,kick:'x.....x...x.....',snare:'....x.......x...',hat:'x.x.x.x.x.x.x.x.',ghost:'.x...x.x.x...x.x',pmel:[[62,0,63,0,66,0,67,0,69,0,0,0,67,0,66,0],[63,0,0,0,62,0,0,0,0,0,0,0,0,0,0,0]],bass:[38,38]},
+{id:'trap',cat:'trap',name:'Trap',sub:'Atlanta bounce · 140 BPM',bpm:140,swing:0,kick:'x......x..x.....',snare:'........x.......',hat:'x.xxx.x.x.xxx.xx',roll:[13,14,15],chords:[[57,60,64],[53,57,60],[55,59,62],[52,55,59]],bass:[33,29,31,28],b808:1,inst:'bell'},
+{id:'drill',cat:'trap',name:'Drill',sub:'UK / NY slide · 142 BPM',bpm:142,swing:0,kick:'x.........x.....',snare:'........x..x....',hat:'x..x..x...x..x..',chords:[[56,59,63],[54,58,61]],bass:[32,30],b808:1,glide:5,inst:'pad'},
+{id:'mezoued',cat:'tn',name:'Mezoued',sub:'Tounsi darbouka · 100 BPM',bpm:100,swing:.08,doum:'x.......x.......',tek:'..x...x.....x...',ghost:'.x.x.x.x.x.x.x.x',mel:[[74,0,72,70,69,0,70,0,69,0,67,0,66,0,67,0],[66,0,67,0,69,0,66,0,63,0,62,0,63,0,62,0]],bass:[38,38]},
+{id:'lofi',cat:'more',name:'Lo-fi',sub:'Chill late-night · 80 BPM',bpm:80,swing:.2,kick:'x......x..x.....',rim:'....x.......x...',hat:'..x...x...x...x.',chords:[[60,64,67,71],[57,60,64,67],[62,65,69,72],[55,59,62,65]],bass:[36,33,38,31],inst:'keys',vinyl:1},
+{id:'gfunk',cat:'more',name:'G-funk',sub:'West Coast cruise · 94 BPM',bpm:94,swing:.1,kick:'x......x..x.....',snare:'....x.......x...',clap:'....x.......x...',hat:'x.x.x.x.x.x.x.x.',chords:[[55,59,62,65],[60,64,67,70]],bass:[31,36],inst:'keys',lead:[[79,0,0,0,77,0,0,0,74,0,0,0,72,0,74,0],[0,0,0,0,72,0,0,0,70,0,0,0,67,0,0,0]]},
+{id:'afro',cat:'more',name:'Afrobeats',sub:'Lagos bounce · 104 BPM',bpm:104,swing:.06,kick:'x..x....x..x....',rim:'...x..x....x..x.',clap:'....x.......x...',shk:'xxxxxxxxxxxxxxxx',chords:[[60,64,67,71],[62,65,69,72],[57,60,64,67],[59,62,65,69]],bass:[36,38,33,35],inst:'bell'},
+{id:'dembow',cat:'more',name:'Reggaeton',sub:'Dembow riddim · 95 BPM',bpm:95,swing:0,kick:'x...x...x...x...',snare:'...x..x....x..x.',hat:'x.x.x.x.x.x.x.x.',chords:[[57,60,64],[53,57,60],[60,64,67],[55,59,62]],bass:[33,29,36,31],b808:1,inst:'pad'},
+{id:'phonk',cat:'trap',name:'Phonk',sub:'Drift cowbell · 130 BPM',bpm:130,swing:0,kick:'x..x..x...x..x..',snare:'....x.......x...',hat:'x.x.x.x.x.x.x.x.',cow:[[72,0,72,0,75,0,72,0,70,0,72,0,67,0,0,0],[72,0,72,0,75,0,77,0,75,0,72,0,70,0,67,0]],bass:[36,36],b808:1,glide:-5},
+{id:'stambeli',cat:'tn',name:'Stambeli',sub:'Tounsi gumbri trance · 116 BPM',bpm:116,swing:.12,doum:'x.....x.....x...',tek:'...x.....x......',chk:'x.xx.xx.x.xx.xx.',gum:[[43,0,0,46,0,0,48,0,0,46,0,0,43,0,41,0],[43,0,0,43,0,0,46,0,48,0,0,46,0,0,41,0]],bass:[31,31]}];
 let style=STYLES[0],mode='synth',ctx=null,master=null,noiseBuf=null,playing=false,timer=null,nextT=0,step=0,bar=0,vis=[],vinylSrc=null;
 function initAudio(){
   if(ctx)return;
@@ -364,9 +428,15 @@ const doum=t=>{const o=osc('sine',95,t,.35,.9);o.frequency.exponentialRampToValu
 const tek=(t,v=.5)=>{noise(t,.06,v,'bandpass',3200,2);osc('sine',420,t,.04,v*.4)};
 function b808(t,f,dur,glide){const o=ctx.createOscillator(),g=ctx.createGain(),ws=ctx.createWaveShaper(),c=new Float32Array(256);for(let i=0;i<256;i++){const x=i/128-1;c[i]=Math.tanh(2.2*x)}ws.curve=c;o.type='sine';o.frequency.setValueAtTime(f,t);if(glide)o.frequency.exponentialRampToValueAtTime(f*2**(glide/12),t+dur*.6);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.7,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(ws);ws.connect(g);g.connect(master);o.start(t);o.stop(t+dur+.05)}
 function chord(t,notes,dur,inst){for(const n of notes){if(inst==='bell'){osc('sine',mid(n+12),t,.9,.06);osc('sine',mid(n+12),t+dur/2,.9,.05)}else if(inst==='pad'){const o=osc('sawtooth',mid(n),t,dur,.035,null,900)}else{osc('triangle',mid(n),t,dur*.9,.07,null,1800)}}}
+const clap=t=>{for(const d of [0,.011,.022])noise(t+d,.09,.35,'bandpass',1400,1.2)};
+const shk=t=>noise(t,.045,.07,'highpass',6000);
+const chk=(t,v)=>noise(t,.07,v,'bandpass',6500,3);
+const cow=(t,f)=>{osc('square',f,t,.22,.07,null,2600);osc('square',f*1.48,t,.22,.05,null,2600)};
+function lead(t,f,dur){const o=ctx.createOscillator(),g=ctx.createGain(),l=ctx.createOscillator(),lg=ctx.createGain();o.type='sine';o.frequency.setValueAtTime(f*.94,t);o.frequency.exponentialRampToValueAtTime(f,t+.08);l.frequency.value=5.5;lg.gain.value=f*.012;l.connect(lg);lg.connect(o.frequency);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.12,t+.04);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g);g.connect(master);o.start(t);l.start(t);o.stop(t+dur+.05);l.stop(t+dur+.05)}
+const gum=(t,f,dur)=>{osc('triangle',f,t,dur,.4,null,700);osc('square',f,t,dur*.4,.06,null,500)};
 function playStep(s,i,b,t,sd){
   const on=p=>p&&p[i]==='x';
-  if(on(s.kick)){kick(t);const r=s.bass[b%s.bass.length];if(s.b808)b808(t,mid(r),sd*(i===0?6:4),s.glide&&i>0?s.glide:0);else osc('sine',mid(r),t,sd*3,.45)}
+  if(on(s.kick)){kick(t);const r=s.bass?s.bass[b%s.bass.length]:0;if(r)if(s.b808)b808(t,mid(r),sd*(i===0?6:4),s.glide&&i>0?s.glide:0);else osc('sine',mid(r),t,sd*3,.45)}
   if(on(s.snare))snare(t);
   if(on(s.rim))rim(t);
   if(on(s.hat))hat(t,s.vinyl?.1:.18);
@@ -377,6 +447,18 @@ function playStep(s,i,b,t,sd){
   if(on(s.ghost))tek(t,.12);
   if(s.mel){const n=s.mel[b%s.mel.length][i];if(n)osc('sawtooth',mid(n),t,sd*1.6,.05,null,2400)}
   if(s.chords&&i===0)chord(t,s.chords[b%s.chords.length],sd*16,s.inst);
+  if(on(s.clap))clap(t);
+  if(on(s.shk))shk(t);
+  if(on(s.chk))chk(t,i%3===0?.3:.16);
+  const pick=a=>a?a[b%a.length][i]:0;
+  let n;
+  if(n=pick(s.cow))cow(t,mid(n));
+  if(n=pick(s.lead))lead(t,mid(n),sd*3.5);
+  if(n=pick(s.gum))gum(t,mid(n),sd*2.5);
+  if(n=pick(s.bline)){osc('triangle',mid(n),t,sd*3.6,.5,null,500);osc('sine',mid(n),t,sd*3.6,.35)}
+  if(n=pick(s.pmel)){osc('triangle',mid(n),t,sd*2.2,.13,null,2600);osc('sine',mid(n+12),t,sd*1.2,.03)}
+  if(n=pick(s.brass)){for(const k of [0,-5,7]){osc('sawtooth',mid(n+k),t,sd*1.6,.045,null,1700)}}
+  if(on(s.stabs)&&s.chords){for(const k of s.chords[b%s.chords.length])osc('triangle',mid(k),t,sd*1.4,.09,null,1500)}
 }
 
 let speed=1,clock=null;
@@ -406,20 +488,20 @@ function vinyl(on){
 
 /* ---------- challenge ---------- */
 const TOTAL=16;
-let chal=false;const ch={bar:-1,score:0,streak:0,best:0,hit:false,topic:null};
+let chal=false;const ch={word:0,cnt:false,score:0,streak:0,best:0,hit:false,topic:null};
 function setMode(c){
   if(playing)stop();chal=c;
   $('mFree').setAttribute('aria-pressed',!c);$('mChal').setAttribute('aria-pressed',c);
-  $('hud').hidden=!c;$('hitBtn').hidden=!c;$('topic').hidden=!c;
-  showCard(c?'Ready?':'Yalla',c?'16 bars · a new topic every 8 · tap “Got it!” each time you land the word':'Press play and get ready');
+  $('hud').hidden=!c;renderBeats();$('hitBtn').hidden=!c;$('topic').hidden=!c;
+  showCard(c?'Ready?':'Yalla',c?'16 words · a new topic every 8 · tap “Got it!” each time you land the word':'Press play and get ready');
 }
 $('mFree').addEventListener('click',()=>setMode(false));
 $('mChal').addEventListener('click',()=>setMode(true));
-function hud(){$('hScore').textContent=ch.score;$('hStreak').textContent=ch.streak;$('hBar').textContent=ch.bar>0?Math.min(ch.bar,TOTAL)+'/'+TOTAL:'–'}
+function hud(){$('hScore').textContent=ch.score;$('hStreak').textContent=ch.streak;$('hBar').textContent=ch.word>0?Math.min(ch.word,TOTAL)+'/'+TOTAL:'–'}
 function fly(txt,bad){const f=document.createElement('div');f.className='fly'+(bad?' bad':'');f.textContent=txt;$('tile').appendChild(f);setTimeout(()=>f.remove(),950)}
 function newTopic(){const t=TOPICS.filter(x=>!ch.topic||x[0]!==ch.topic[0]);ch.topic=t[Math.random()*t.length|0];$('topic').textContent='Topic: '+ch.topic[0]+' ('+ch.topic[1]+')'}
 function hit(){
-  if(!chal||!playing||ch.bar<1||ch.bar>TOTAL||ch.hit)return;
+  if(!chal||!playing||ch.cnt||ch.word<1||ch.word>TOTAL||ch.hit)return;
   ch.hit=true;ch.score++;ch.streak++;ch.best=Math.max(ch.best,ch.streak);
   fly(ch.streak>=3?'COMBO ×'+ch.streak:'+1');$('hitBtn').disabled=true;hud();
 }
@@ -443,15 +525,18 @@ let barStart=0,barDur=1;
 function pulse(one){const g=$('glow');g.className='glow';void g.offsetWidth;g.className='glow go'+(one?' one':'')}
 function tick(beat,now){
   lamps.forEach((l,i)=>{l.classList.remove('on');if(i===beat){void l.offsetWidth;l.classList.add('on')}});
-  pulse(beat===0);
-  if(beat!==0){if(chal&&ch.bar===0)showCard(['','3','2','1'][beat],null,'count');return}
-  barStart=now;barDur=4*60/bpmNow();left=false;
+  pulse(beat===0);curBeat=beat;
+  if(beat===0){barStart=now;barDur=4*60/bpmNow()}
+  if(chal&&ch.cnt){showCard(['4','3','2','1'][beat],null,'count');$('hitBtn').disabled=true;if(beat===3)ch.cnt=false;hud();return}
+  if(beat===0){barIdx++;newBar()}
+  const w=W(),isWord=w===8?(beat===0&&barIdx%2===0):w===4?beat===0:beat%2===0;
+  if(!isWord)return;
+  wordStart=now;wordDur=w*60/bpmNow();left=false;
   if(!chal){nextWord();return}
-  if(ch.bar>=1&&!ch.hit){ch.streak=0;const t=$('tile');t.classList.remove('miss');void t.offsetWidth;t.classList.add('miss');fly('miss',true)}
-  ch.bar++;ch.hit=false;
-  if(ch.bar>TOTAL){hud();endChallenge();return}
-  if(ch.bar===0){showCard('4',null,'count');$('hitBtn').disabled=true;hud();return}
-  if((ch.bar-1)%8===0)newTopic();
+  if(ch.word>=1&&!ch.hit){ch.streak=0;const t=$('tile');t.classList.remove('miss');void t.offsetWidth;t.classList.add('miss');fly('miss',true)}
+  ch.word++;ch.hit=false;
+  if(ch.word>TOTAL){hud();endChallenge();return}
+  if((ch.word-1)%8===0)newTopic();
   nextWord();$('hitBtn').disabled=false;hud();
 }
 
@@ -471,21 +556,22 @@ function loop(){
   else if(mode==='yt'){now=performance.now()/1000;const bpm=bpmIn();const b=Math.floor((now-t0)*bpm/60);if(b!==lastBeat){lastBeat=b;tick(((b%4)+4)%4,t0+b*60/bpm)}}
   else{now=audio.currentTime;const bpm=Math.max(50,Math.min(200,+$('bpm').value||90));const b=Math.floor(now*bpm/60);if(b!==lastBeat){lastBeat=b;tick(b%4,b*60/bpm)}}
   const span=mode==='file'?barDur*speed:barDur;
-  const fr=Math.max(0,Math.min(1,(now-barStart)/span));$('prog').style.width=fr*100+'%';
-  if(fr>=.92&&!left&&barStart>0)leaveCard();
+  const ws=mode==='file'?wordDur*speed:wordDur,el=now-wordStart,fr=wordStart>=0?Math.max(0,Math.min(1,el/ws)):0;
+  $('prog').style.width=fr*100+'%';$('npProg').style.width=fr*100+'%';
+  if(wordStart>=0&&!left&&el>=ws-.3*ws/W())leaveCard();
   requestAnimationFrame(loop);
 }
 function start(){
-  initAudio();ctx.resume();playing=true;$('play').textContent='■ Stop';fam=null;
-  if(chal){Object.assign(ch,{bar:-1,score:0,streak:0,best:0,hit:false,topic:null});hud();$('topic').textContent='Topic: get ready'}
+  initAudio();ctx.resume();playing=true;$('play').textContent='■ Stop';renderBeats();fam=null;barsOnFam=0;barIdx=-1;wordStart=-1;curBeat=0;renderBarDots();
+  if(chal){Object.assign(ch,{word:0,cnt:true,score:0,streak:0,best:0,hit:false,topic:null});hud();$('topic').textContent='Topic: get ready'}
   if(mode==='synth'){nextT=ctx.currentTime+.08;step=0;bar=0;vis=[];schedule();startClock();vinyl(style.vinyl)}
   else if(mode==='yt'){t0=performance.now()/1000;lastBeat=-1}
   else{audio.currentTime=0;lastBeat=-1;audio.playbackRate=speed;audio.volume=+$('vol').value;audio.play().catch(()=>{$('ownHint').textContent='Could not play this file.';stop()})}
   requestAnimationFrame(loop);
 }
-function stop(){playing=false;stopClock();vis=[];if(ctx)vinyl(false);audio.pause();lamps.forEach(l=>l.classList.remove('on'));$('play').textContent='▶ Play';$('prog').style.width='0';$('hitBtn').disabled=true}
+function stop(){playing=false;stopClock();vis=[];if(ctx)vinyl(false);audio.pause();lamps.forEach(l=>l.classList.remove('on'));$('play').textContent='▶ Play';$('npProg').style.width='0';renderBeats();$('prog').style.width='0';$('hitBtn').disabled=true}
 $('play').addEventListener('click',()=>playing?stop():start());
-$('skip').addEventListener('click',()=>{if(!chal||ch.bar>=1)nextWord(true)});
+$('skip').addEventListener('click',()=>{if(!playing)return;if(!chal||ch.word>=1)nextWord(true)});
 $('vol').addEventListener('input',e=>{if(master)master.gain.value=+e.target.value;audio.volume=+e.target.value});
 $('speed').addEventListener('input',e=>{
   const was=playing&&mode==='synth';speed=+e.target.value;$('speedTxt').textContent='×'+speed.toFixed(2);
@@ -498,7 +584,7 @@ document.addEventListener('keydown',e=>{
   if(e.key==='g'||e.key==='G'||e.key==='Enter'&&chal&&e.target.tagName!=='BUTTON'){e.preventDefault();hit()}
 });
 
-function updStat(){$('stat').textContent='Beat: '+beatLabel()+' · '+Math.round(bpmNow())+' BPM';$('ytSync').hidden=mode!=='yt';$('ytUse').setAttribute('aria-pressed',mode==='yt');$('ytUse').textContent=mode==='yt'?'Using YouTube beat ✓':'Use my YouTube beat'}
+function updStat(){$('stat').textContent='Beat: '+beatLabel()+' · '+Math.round(bpmNow())+' BPM';$('ytSync').hidden=mode!=='yt';$('ytUse').setAttribute('aria-pressed',mode==='yt');$('ytUse').textContent=mode==='yt'?'Using YouTube beat ✓':'Use my YouTube beat';if(typeof COV!=='undefined')renderBeats()}
 const YTQ=[['Tunisian rap','tunisian rap beat instrumental'],['Boom bap','boom bap beat instrumental'],['Trap','trap beat instrumental'],['Drill','drill beat instrumental'],['Mezoued','mezoued tounsi instrumental'],['Lo-fi','lofi hip hop beat instrumental']];
 const ytUrl=q=>'https://www.youtube.com/results?search_query='+encodeURIComponent(q);
 $('ytChips').innerHTML=YTQ.map(([n,q])=>'<a class="chip" target="_blank" rel="noopener" style="text-decoration:none;color:inherit" href="'+esc(ytUrl(q))+'">'+esc(n)+'</a>').join('');
@@ -507,12 +593,31 @@ $('ytQ').addEventListener('input',ytSet);
 $('ytQ').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();ytSet();$('ytGo').click()}});
 $('ytUse').addEventListener('click',()=>{if(playing)stop();mode='yt';renderBeats();updStat();$('ytHint').textContent='Ready: press Play, then hit “Sync on the 1” when the beat drops.'});
 $('ytSync').addEventListener('click',()=>{if(!playing||mode!=='yt')return;t0=performance.now()/1000;lastBeat=-1});
+const COV={boombap:['#e8115b','#5b0a26','BOOM BAP'],trap:['#8d67ab','#2b1d3a','TRAP'],drill:['#1e3264','#0a1022','DRILL'],mezoued:['#e13300','#5a1500','MEZOUED'],lofi:['#477d95','#15303b','LO-FI'],
+ gfunk:['#ba5d07','#3d1f02','G-FUNK'],bbjazz:['#d4a24c','#4a3210','DUSTY JAZZ'],bbdark:['#3d3d3d','#0d0d0d','DARK PIANO'],bbgold:['#e0b100','#5c4200','GOLDEN ERA'],bbtn:['#c8102e','#2b0a0f','BOOM BAP TOUNSI'],afro:['#27856a','#0b3127','AFRO'],dembow:['#e91429','#4a0610','DEMBOW'],phonk:['#509bf5','#122a52','PHONK'],stambeli:['#b49bc8','#3a2a4d','STAMBELI']};
+const SHELVES=[['boom','Boom bap'],['trap','Trap, Drill & Phonk'],['tn','Tounsi'],['more','More vibes']];
 function renderBeats(){
-  $('beats').innerHTML=STYLES.map(s=>'<button class="beat" data-id="'+s.id+'" aria-pressed="'+(mode==='synth'&&s===style)+'"><strong>'+s.name+'</strong><span>'+s.sub+'</span></button>').join('');
+  const card=s=>{const c=COV[s.id]||['#555','#222',s.name],on=mode==='synth'&&s===style,pl=on&&playing,parts=s.sub.split(' · ');
+    return '<div class="sc'+(pl?' playing':'')+'" role="button" tabindex="0" data-id="'+s.id+'" aria-pressed="'+on+'"><div class="cover" style="--c1:'+c[0]+';--c2:'+c[1]+'"><b>'+c[2]+'</b><small>'+s.bpm+' BPM</small><button class="spPlay" data-play aria-label="'+(pl?'Stop ':'Play ')+s.name+'">'+(pl?'■':'▶')+'</button></div><strong>'+(on?'<span class="eq"><i></i><i></i><i></i></span>':'')+s.name+'</strong><span>'+esc(parts.slice(0,-1).join(' · ')||parts[0])+'</span></div>'};
+  $('beats').innerHTML=SHELVES.map(([k,t])=>{const list=STYLES.filter(s=>s.cat===k);return list.length?'<h3 class="shelfT">'+t+'</h3><div class="shelf">'+list.map(card).join('')+'</div>':''}).join('');
+  const c=mode==='synth'?(COV[style.id]||['#555','#222','']):mode==='yt'?['#ff0033','#3a0010','YT']:['#535353','#1a1a1a','MP3'];
+  const nc=$('npCover');nc.style.setProperty('--c1',c[0]);nc.style.setProperty('--c2',c[1]);nc.textContent=(c[2]||'').slice(0,2);
+  $('npName').textContent=beatLabel();$('npSub').textContent='Freestyle Tounsi · '+Math.round(bpmNow())+' BPM'+(chal?' · Challenge':'');
+  $('npPlay').textContent=playing?'❚❚':'▶';$('npPlay').setAttribute('aria-label',playing?'Stop':'Play');
 }
-$('beats').addEventListener('click',e=>{const b=e.target.closest('.beat');if(!b)return;const was=playing;if(was)stop();
-  style=STYLES.find(s=>s.id===b.dataset.id);mode='synth';renderBeats();updStat();if(was)start()});
+function pickBeat(id,andPlay){
+  const same=mode==='synth'&&style.id===id;
+  if(andPlay&&same&&playing){stop();return}
+  const was=playing;if(was)stop();
+  style=STYLES.find(s=>s.id===id);mode='synth';updStat();renderBeats();if(was||andPlay)start();
+}
+$('beats').addEventListener('click',e=>{const b=e.target.closest('.sc');if(!b)return;pickBeat(b.dataset.id,!!e.target.closest('[data-play]'))});
+$('beats').addEventListener('keydown',e=>{const b=e.target.closest('.sc');if(b&&e.target===b&&(e.key==='Enter'||e.key===' ')){e.preventDefault();pickBeat(b.dataset.id,false)}});
+$('npPlay').addEventListener('click',()=>playing?stop():start());
 renderBeats();
+renderBarDots();
+$('bars').addEventListener('change',()=>{renderBarDots();if(fam){famTxt();renderStrip()}});
+$('lvl').addEventListener('change',()=>{if(fam)renderStrip()});
 
 /* ---------- word wall ---------- */
 function renderWall(){
@@ -553,10 +658,10 @@ const TOUR=[
  ['#tile','The word card','Every 4 ticks (one bar) a new Tunisian word drops here, with its meaning. Rap a line that ends on it. The tag on top shows the sound to rhyme on, like -ar.'],
  ['.lamps','The beat lights','They light up on each tick: 1, 2, 3, 4. The red light is beat 1 — that’s when the new word lands.'],
  ['#strip','Bar line and Up next','The line fills up during the bar so you see when the word is about to change. “Up next” shows the next words so you can prepare your rhyme.'],
- ['.seg','Free style or Challenge','Free style: just practice. Challenge: 16 bars with a topic. Tap “Got it!” (or press G) each time you really use the word — build combos and get your rank at the end.'],
+ ['.seg','Free style or Challenge','Free style: just practice. Challenge: 16 words with a topic. Tap “Got it!” (or press G) each time you really use the word — build combos and get your rank at the end.'],
  [()=>$('play').parentElement,'Play and Skip','Play starts the beat and the words (or press Space). Skip word jumps to a new rhyme sound if you’re stuck.'],
- [()=>$('speed').closest('.side'),'Speed and settings','Speed makes the beat slower or faster. “New sound every” sets how many bars you keep the same rhyme sound. Volume is the beat loudness.'],
- ['#beats','Choose your beat','Five beats made right here: Boom bap, Trap, Drill, Mezoued and Lo-fi. Tap one to switch.'],
+ [()=>$('speed').closest('.side'),'Speed and settings','Speed makes the beat slower or faster. “New sound every” sets how many bars you keep the same rhyme sound. Level sets how fast words come: Easy every 2 bars, Normal every bar, Hard every 2 beats. Volume is the beat loudness.'],
+ ['#beats','Choose your beat','14 beats made right here — five kinds of Boom bap, Trap, Drill, Phonk, Mezoued, Stambeli and more. Tap one to switch.'],
  ['#yt','Your own beat or YouTube','Load an MP3, or search a beat on YouTube, play it there, tap the tempo and press “Use my YouTube beat”. “Sync on the 1” lines the words up with the music.'],
  ['#add','Zid kelma','Add Tunisian words in Arabic or Latin letters (3, 7, 9). They go on the word wall and into everyone’s freestyle.'],
  ['#fams','The word wall','All the words, grouped by rhyme sound. A sound needs 3 words before it comes up in the freestyle. Yalla, à toi!']];
