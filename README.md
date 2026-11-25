@@ -10,9 +10,10 @@ A freestyle rap trainer in Tunisian Darija. Pick a beat, press play, and a new T
 - Bar counter that follows the "new sound every 2 / 4 / 8 bars" setting
 - About 100 starter words in Tunisian Arabizi, in 14 rhyme sounds
 - Add your own words in Arabic or Latin letters (3, 7, 9) — rhyme sounds are detected automatically
+- Shared word wall: words added on the live site are stored in Supabase and shown to everyone
 - Guided tour for new visitors
 
 ## Run it
 It's a single `index.html` file — open it in a browser, or host it with GitHub Pages.
 
-Note: when hosted outside Claude, words people add are saved in their own browser only.
+Shared words are stored in a Supabase table `words` (read + insert for visitors; delete only from the Supabase dashboard).
