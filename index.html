@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Freestyle Tounsi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Lalezar&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: a game — bouncy, loud, rewarding; a rooftop cypher in Tunis at night.
+   IDEA: an arcade rhyme machine: words drop in on the 1, fly away on the next bar.
+   PICTURE: the glowing word card with beat lamps, a bar progress line and the upcoming-word strip.
+   COLOUR and TYPE: Sidi Bou Said blue stage, whitewash buttons, flag red for "Tounsi" and misses; Lilita One + Fredoka, Lalezar for Arabic.
+   LAYOUT: stage (card + controls) on top, beats under it, then the shared word wall. */
+:root{color-scheme:light dark;
+--bg:light-dark(#f3f7fc,#04121f);--ink:light-dark(#0b2238,#eaf3fc);--soft:light-dark(#4f6680,#93abc6);
+--card:light-dark(#fff,#0a2135);--line:light-dark(#d3e0ee,#163a5c);--vio:#0b5fb0;--vio2:light-dark(#0a56a8,#5fb4ff);
+--gold1:#ffffff;--gold2:#d6e6f5;--goldInk:#063a73;--sun:#ffd84d;--red:#ff3b5c;--D:'Lilita One',Lalezar,Impact,sans-serif}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Fredoka,Rubik,system-ui,sans-serif;overflow-x:clip}
+.band{padding:clamp(24px,3.5vw,48px) max(5vw,16px)}
+.wrap{max-width:1240px;margin:0 auto}
+h1,h2,.d{font-family:var(--D);font-weight:400;letter-spacing:.3px}
+h2{font-size:32px;line-height:1.05;margin:0 0 6px}
+.muted{color:var(--soft)}
+/* stage */
+.stage{position:relative;overflow:hidden;color:#fff;background:linear-gradient(180deg,#3a9be8 0%,#0b5fb0 55%,#063a73 100%);padding:clamp(20px,3vw,36px) max(5vw,16px) clamp(28px,4vw,52px)}
+.stage::before{content:"";position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Cg fill='none' stroke='%23fff' stroke-width='1.6'%3E%3Crect x='28' y='28' width='40' height='40'/%3E%3Crect x='28' y='28' width='40' height='40' transform='rotate%2845 48 48%29'/%3E%3Ccircle cx='48' cy='48' r='9'/%3E%3Cpath d='M0 0l10 10M96 0L86 10M0 96l10-10M96 96l-10-10'/%3E%3Cpath d='M48 0l6 6-6 6-6-6zM48 96l6-6-6-6-6 6zM0 48l6 6 6-6-6-6zM96 48l-6 6-6-6 6-6z'/%3E%3C/g%3E%3C/svg%3E");background-size:96px 96px;opacity:.09;pointer-events:none;-webkit-mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.6) 60%,transparent 100%);mask-image:linear-gradient(180deg,#000 0%,rgba(0,0,0,.6) 60%,transparent 100%)}
+.blob{position:absolute;border-radius:50%;filter:blur(40px);opacity:.45;pointer-events:none;animation:drift 14s ease-in-out infinite alternate}
+.b1{width:340px;height:340px;background:#ffffff;left:-80px;top:-60px}.b2{width:420px;height:420px;background:#3fd3ff;right:-120px;bottom:-140px;animation-duration:18s}
+@keyframes drift{to{transform:translate(60px,40px) scale(1.15)}}
+.glow{position:absolute;inset:0;background:radial-gradient(circle at 35% 45%,rgba(255,255,255,.22),transparent 60%);opacity:0;pointer-events:none}
+.glow.go{animation:flash .28s ease-out}.glow.go.one{animation:flash1 .4s ease-out}
+@keyframes flash{from{opacity:.7}to{opacity:0}}@keyframes flash1{from{opacity:1}to{opacity:0}}
+.top{position:relative;max-width:1240px;margin:0 auto 18px;display:flex;flex-wrap:wrap;gap:10px 20px;align-items:end;justify-content:space-between}
+h1{font-size:clamp(36px,5vw,52px);line-height:1.05;margin:0}
+h1 b{font-weight:400;background:var(--red);padding:0 .2em;border-radius:10px;display:inline-block;transform:rotate(-3deg)}
+.top p{margin:0;opacity:.88;max-width:48ch}
+.door{position:relative;max-width:1240px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:20px}
+.tile{position:relative;background:rgba(3,30,60,.55);border:1px solid rgba(255,255,255,.14);border-radius:28px;padding:clamp(18px,3vw,32px);min-height:360px;display:flex;flex-direction:column;gap:12px;box-shadow:0 24px 60px rgba(0,20,50,.45),inset 0 1px 0 rgba(255,255,255,.12);overflow:hidden}
+.tile.miss{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-8px)}50%{transform:translateX(6px)}75%{transform:translateX(-3px)}}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);border-radius:999px;padding:5px 12px;font-size:14px;font-weight:600}
+.pill.topic{background:var(--red)}
+.wbox{flex:1;display:grid;place-items:center start;min-height:150px}
+.wbox>div{grid-area:1/1}
+.word{font:400 clamp(58px,11vw,124px)/1 var(--D);overflow-wrap:anywhere;text-shadow:0 6px 0 rgba(0,0,0,.25)}
+.gloss{font-size:18px;opacity:.85;min-height:1.5em;margin-top:6px}
+.w-in{animation:wIn .5s cubic-bezier(.2,1.55,.45,1) both}
+.w-out{animation:wOut .18s ease-in both;pointer-events:none}
+@keyframes wIn{from{opacity:0;transform:translateY(46px) scale(.55) rotate(-5deg)}}
+@keyframes wOut{to{opacity:0;transform:translateY(-60px) scale(1.2) rotate(3deg)}}
+.count{font:400 clamp(90px,16vw,170px)/1 var(--D);color:#fff}
+.prog{height:8px;border-radius:99px;background:rgba(255,255,255,.14);overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,#8fd3ff,#fff);border-radius:99px}
+.strip{display:flex;gap:8px;align-items:center;overflow:hidden;min-height:38px}
+.strip small{opacity:.7;font-size:13px;flex:none}
+.up{flex:none;background:rgba(255,255,255,.1);border-radius:12px;padding:4px 12px;font:400 18px var(--D);animation:sIn .35s ease-out both}
+.up:nth-child(3){animation-delay:.05s}.up:nth-child(4){animation-delay:.1s}.up.new{background:none;border:1px dashed rgba(255,255,255,.4);font:600 14px Fredoka,sans-serif}
+@keyframes sIn{from{opacity:0;transform:translateX(24px)}}
+.fly{position:absolute;right:32px;top:38%;font:400 40px var(--D);color:var(--sun);pointer-events:none;animation:fly .9s ease-out forwards}
+.fly.bad{color:var(--red)}
+@keyframes fly{from{opacity:1;transform:translateY(10px) scale(.8)}40%{transform:translateY(-14px) scale(1.25)}to{opacity:0;transform:translateY(-70px) scale(1)}}
+.side{display:flex;flex-direction:column;gap:12px}
+.lamps{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;background:rgba(3,30,60,.45);border-radius:20px;padding:14px}
+.lamp{position:relative;aspect-ratio:1;border-radius:50%;background:rgba(255,255,255,.12);display:grid;place-items:center;font:400 24px var(--D);color:rgba(255,255,255,.5)}
+.lamp.on{background:var(--gold1);color:var(--goldInk);animation:lamp .18s ease-out}
+.lamp.on.one{background:var(--red);color:#fff}
+.lamp.on::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:3px solid currentColor;animation:ring .5s ease-out forwards}
+.lamp.on.one::after{border-color:var(--red)}
+@keyframes lamp{from{transform:scale(1.25)}}
+@keyframes ring{from{opacity:.9;transform:scale(.9)}to{opacity:0;transform:scale(1.6)}}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:rgba(3,30,60,.45);border-radius:999px;padding:4px}
+.seg button{min-height:44px;border:0;border-radius:999px;background:none;color:#fff;font:600 16px Fredoka,sans-serif;cursor:pointer}
+.seg button[aria-pressed=true]{background:#fff;color:#063a73}
+.ctl{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+button,select,input{font:inherit;font-size:16px}
+.btn{min-height:44px;padding:0 18px;border-radius:16px;border:0;background:#fff;color:#063a73;font-weight:700;cursor:pointer;transition:transform .08s}
+.btn:active{transform:scale(.96)}
+.gold{background:linear-gradient(180deg,var(--gold1),var(--gold2));color:var(--goldInk);box-shadow:0 4px 0 #8fb0d3}
+.band .gold,dialog .gold{background:linear-gradient(180deg,#3a9be8,#0b5fb0);color:#fff;box-shadow:0 4px 0 #063a73}
+.big{min-height:56px;padding:0 26px;font-size:19px}
+.btn.ghost{background:transparent;color:inherit;border:2px solid currentColor}
+.hit{flex:1;min-height:64px;font:400 26px var(--D);background:linear-gradient(180deg,#5cf0a6,#1fb978);color:#06331d;box-shadow:0 5px 0 #11804f}
+.hit:disabled{opacity:.45;cursor:default}
+.btn:focus-visible,select:focus-visible,input:focus-visible,.beat:focus-visible,.seg button:focus-visible{outline:3px solid #ffd23f;outline-offset:2px}
+.hud{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.hud div{background:rgba(3,30,60,.45);border-radius:14px;padding:8px 4px}
+.hud b{display:block;font:400 30px/1 var(--D)}.hud span{font-size:13px;opacity:.8}
+.hud .combo b{color:var(--sun)}
+label.sel{display:flex;gap:8px;align-items:center;font-size:15px;flex-wrap:wrap}
+select{min-height:44px;border-radius:12px;border:0;padding:0 10px;background:#fff;color:#0b2238}
+input[type=range]{accent-color:#fff;min-height:44px}
+.stat{font-size:14px;opacity:.85}
+[hidden]{display:none!important}
+/* beats */
+.beats{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-top:14px}
+.beat{text-align:left;background:var(--card);color:var(--ink);border:2px solid var(--line);border-radius:18px;padding:14px 16px;cursor:pointer;min-height:96px;display:flex;flex-direction:column;gap:4px;transition:transform .12s}
+.beat:hover{transform:translateY(-3px)}
+.beat strong{font:400 24px/1.05 var(--D)}
+.beat span{font-size:14px;color:var(--soft)}
+.beat[aria-pressed=true]{border-color:transparent;background:linear-gradient(160deg,#3a9be8,#0b5fb0);color:#fff}
+.beat[aria-pressed=true] span{color:#dcecfb}
+.own{display:grid;gap:10px;margin-top:12px;background:var(--card);border:2px dashed var(--line);border-radius:18px;padding:14px 16px}
+.own .ctl input[type=number]{width:90px}
+input[type=text],input[type=number]{min-height:44px;border-radius:12px;border:2px solid var(--line);background:var(--bg);color:var(--ink);padding:0 12px}
+input[type=file]{font-size:15px;max-width:100%}
+.own .btn.ghost{color:var(--vio2)}
+/* words */
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:28px;align-items:start}
+form.add{display:grid;gap:10px;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:18px}
+form.add .btn{justify-self:start}
+.hint{font-size:14px;color:var(--soft);min-height:1.4em}
+.hint b{color:var(--red)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:15px}
+.chip i{font-style:normal;color:var(--soft);font-size:13px}
+.chip button{border:0;background:none;color:var(--red);cursor:pointer;font-size:18px;line-height:1;min-width:28px;min-height:28px}
+.fams{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:12px}
+.fbox{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:14px}
+.fbox b{display:block;color:var(--vio2);font-size:15px}
+footer{font-size:13px;color:var(--soft)}
+dialog{border:0;padding:0;border-radius:26px;width:min(460px,calc(100vw - 32px));background:var(--card);color:var(--ink);box-shadow:0 30px 80px rgba(0,0,0,.45)}
+dialog[open]{animation:dIn .4s cubic-bezier(.2,1.4,.4,1)}
+@keyframes dIn{from{opacity:0;transform:translateY(30px) scale(.9)}}
+dialog::backdrop{background:rgba(2,16,30,.72)}
+.popTop{background:linear-gradient(180deg,#3a9be8,#0b5fb0);color:#fff;padding:22px 22px 18px}.popTop p{margin:6px 0 0;opacity:.9}.popTop h2{font-size:34px}
+.popBody{display:grid;gap:10px;padding:18px 22px 22px}
+.popBody .btn.ghost{color:var(--ink)}
+.res{text-align:center}.res .score{font:400 84px/1 var(--D);color:var(--vio2);animation:wIn .6s cubic-bezier(.2,1.55,.45,1) both}
+.res .rank{font:400 30px var(--D);margin:4px 0 8px}
+.tour{position:fixed;inset:0;z-index:50}
+.tour .spot{position:fixed;border-radius:20px;box-shadow:0 0 0 9999px rgba(2,16,30,.72);outline:3px solid #fff;transition:all .35s cubic-bezier(.3,1.2,.4,1);pointer-events:none}
+.tour .tcard{position:fixed;width:min(360px,calc(100vw - 24px));background:var(--card);color:var(--ink);border-radius:20px;padding:18px 18px 14px;box-shadow:0 20px 50px rgba(0,0,0,.45);transition:top .35s,left .35s;animation:dIn .35s cubic-bezier(.2,1.4,.4,1)}
+.tcard h3{font:400 26px/1.1 var(--D);margin:0 0 6px;color:var(--vio2)}
+.tcard p{margin:0 0 12px;font-size:16px}
+.tcard .tfoot{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tcard .dots{display:flex;gap:5px;flex-basis:100%;margin-bottom:4px}.tcard .dots i{width:8px;height:8px;border-radius:50%;background:var(--line)}.tcard .dots i.on{background:var(--vio2);width:20px;border-radius:9px}
+.tcard .btn{min-height:44px}.tcard .btn.ghost{color:var(--ink)}
+.tcard .tnext{background:linear-gradient(180deg,#3a9be8,#0b5fb0);color:#fff;box-shadow:0 4px 0 #063a73}
+.tcard .tskip{margin-right:auto;background:none;border:0;color:var(--soft);cursor:pointer;font:inherit;font-size:14px;min-height:44px;padding:0 6px;text-decoration:underline}
+.howto{position:relative;background:rgba(255,255,255,.16);color:#fff;border:0;border-radius:999px;min-height:40px;padding:0 16px;font:600 15px Fredoka,sans-serif;cursor:pointer}
+@media(max-width:820px){.door,.grid2{grid-template-columns:minmax(0,1fr)}.tile{min-height:300px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<dialog id="pop" aria-labelledby="popT">
+  <form id="padd">
+    <div class="popTop"><h2 id="popT">Zid kelma</h2><p>Before you spit, drop one Tunisian word for the cypher. Arabic or Latin letters — your choice.</p></div>
+    <div class="popBody">
+      <input type="text" id="pw" maxlength="20" placeholder="Word, e.g. 7out or حوت" dir="auto" aria-label="Word" autocomplete="off">
+      <input type="text" id="pg" maxlength="40" placeholder="Meaning (optional), e.g. poisson" dir="auto" aria-label="Meaning" autocomplete="off">
+      <div class="hint" id="pHint">One word, 2 to 20 letters.</div>
+      <div class="ctl"><button class="btn gold big" type="submit" id="pBtn">Add my word</button><button class="btn ghost" type="button" id="pSkip">Skip</button></div>
+    </div>
+  </form>
+</dialog>
+<dialog id="result" aria-labelledby="resT">
+  <div class="popTop"><h2 id="resT">Challenge done</h2><p id="resTopic"></p></div>
+  <div class="popBody res">
+    <div class="score" id="resScore">0/16</div>
+    <div class="rank" id="resRank"></div>
+    <div class="muted" id="resMore"></div>
+    <div class="ctl" style="justify-content:center;margin-top:8px"><button class="btn gold big" id="again">Play again</button><button class="btn ghost" id="resClose">Close</button></div>
+  </div>
+</dialog>
+
+<div class="tour" id="tour" hidden role="dialog" aria-modal="true" aria-labelledby="tT"><div class="spot" id="tSpot"></div><div class="tcard" id="tCard"><h3 id="tT"></h3><p id="tD"></p><div class="tfoot"><div class="dots" id="tDots"></div><button class="tskip" id="tSkip" type="button">Skip tour</button><button class="btn ghost" id="tBack" type="button">Back</button><button class="btn tnext" id="tNext" type="button">Next</button></div></div></div>
+<section class="stage" aria-label="Freestyle stage">
+  <div class="blob b1"></div><div class="blob b2"></div><div class="glow" id="glow"></div>
+  <div class="top">
+    <h1>Freestyle <b>Tounsi</b></h1>
+    <p>Every 4 ticks a new Tunisian word drops. Rhyme on the same sound until it switches.</p>
+    <button class="howto" id="howto" type="button">How it works</button>
+  </div>
+  <div class="door">
+    <div class="tile" id="tile">
+      <div class="row"><span class="pill" id="fam">Rhyme on: —</span><span class="pill topic" id="topic" hidden></span></div>
+      <div class="wbox" id="wbox" aria-live="polite"><div class="w-in"><div class="word" dir="auto">Yalla</div><div class="gloss">Press play and get ready</div></div></div>
+      <div class="prog" aria-hidden="true"><i id="prog"></i></div>
+      <div class="strip" id="strip"><small>Up next</small></div>
+    </div>
+    <div class="side">
+      <div class="seg" role="group" aria-label="Mode"><button id="mFree" aria-pressed="true">Free style</button><button id="mChal" aria-pressed="false">Challenge</button></div>
+      <div class="lamps" aria-hidden="true"><div class="lamp one">1</div><div class="lamp">2</div><div class="lamp">3</div><div class="lamp">4</div></div>
+      <div class="hud" id="hud" hidden>
+        <div><b id="hScore">0</b><span>score</span></div>
+        <div class="combo"><b id="hStreak">0</b><span>streak</span></div>
+        <div><b id="hBar">–</b><span>bar</span></div>
+      </div>
+      <button class="btn hit" id="hitBtn" hidden disabled>Got it!</button>
+      <div class="ctl">
+        <button class="btn gold big" id="play">▶ Play</button>
+        <button class="btn ghost" id="skip">Skip word</button>
+        <button class="btn ghost" id="ytSync" hidden>Sync on the 1</button>
+      </div>
+      <label class="sel">Speed <input type="range" id="speed" min="0.7" max="1.3" step="0.05" value="1" aria-label="Speed"> <span id="speedTxt">×1.00</span></label>
+      <div class="ctl">
+        <label class="sel" id="barsWrap">New sound every
+          <select id="bars"><option value="2">2 bars</option><option value="4" selected>4 bars</option><option value="8">8 bars</option></select>
+        </label>
+        <label class="sel">Volume <input type="range" id="vol" min="0" max="1" step="0.05" value="0.8" aria-label="Volume"></label>
+      </div>
+      <div class="stat" id="stat">Beat: Boom bap · 90 BPM</div>
+    </div>
+  </div>
+</section>
+
+<section class="band"><div class="wrap">
+  <h2>Choose your beat</h2>
+  <p class="muted">Five beats built right here in the style of the classics. Want a famous instrumental? Load your own MP3 below.</p>
+  <div class="beats" id="beats"></div>
+  <div class="own">
+    <strong>Use your own beat</strong>
+    <div class="ctl">
+      <input type="file" id="file" accept="audio/*" aria-label="Load your beat file">
+      <label class="sel">BPM <input type="number" id="bpm" min="50" max="200" value="90"></label>
+      <button class="btn ghost" id="tap" type="button">Tap tempo</button>
+    </div>
+    <div class="hint" id="ownHint">Load a file, set its BPM (or tap along), then press Play.</div>
+  </div>
+  <div class="own" id="yt">
+    <strong>Beat from YouTube</strong>
+    <div class="ctl">
+      <input type="text" id="ytQ" value="tunisian rap beat instrumental" aria-label="Search YouTube" style="flex:1;min-width:200px">
+      <a class="btn gold" id="ytGo" target="_blank" rel="noopener" href="#" style="display:inline-flex;align-items:center;text-decoration:none">Search YouTube</a>
+    </div>
+    <div class="chips" id="ytChips"></div>
+    <div class="ctl"><button class="btn ghost" id="ytUse" type="button">Use my YouTube beat</button></div>
+    <div class="hint" id="ytHint">YouTube opens in a new tab. Play the beat there, come back, tap “Tap tempo” along with it (or type the BPM — it’s often in the video title), choose “Use my YouTube beat” and press Play. Hit “Sync on the 1” on a downbeat to line the words up.</div>
+  </div>
+</div></section>
+
+<section class="band" style="padding-top:0"><div class="wrap grid2">
+  <div>
+    <h2>Zid kelma</h2>
+    <p class="muted">Add a Tunisian word for everyone. Write it in Arabic letters (دار) or Latin letters with 3, 7, 9 (dar) — the site finds its rhyme sound by itself, and both kinds rhyme together.</p>
+    <form class="add" id="add">
+      <input type="text" id="w" maxlength="20" placeholder="Word, e.g. 7out or حوت" dir="auto" aria-label="Word" autocomplete="off">
+      <input type="text" id="g" dir="auto" maxlength="40" placeholder="Meaning (optional), e.g. poisson" aria-label="Meaning" autocomplete="off">
+      <div class="hint" id="addHint">One word, 2 to 20 letters.</div>
+      <button class="btn gold" type="submit" id="addBtn">Add word</button>
+    </form>
+  </div>
+  <div>
+    <h2>Word wall</h2>
+    <div class="hint" id="wallHint">Loading shared words…</div>
+    <div class="chips" id="chips"></div>
+    <div class="fams" id="fams"></div>
+  </div>
+</div></section>
+
+<footer class="band" style="padding-top:0"><div class="wrap">Starter words are in Tunisian Arabizi with French meanings. Words added by visitors are shared with everyone who opens this page. Challenge mode is honest-play: tap “Got it!” (or press G) when you really used the word in that bar.</div></footer>
+
+<script>
+{
+const BASE=[["dar","maison"],["nhar","jour"],["bhar","mer"],["nar","feu"],["far","souris"],["kbar","les grands"],["sghar","les petits"],["3ar","honte"],
+["bik","avec toi"],["fik","en toi"],["3lik","sur toi"],["lik","pour toi"],["3inik","tes yeux"],["nestanik","je t'attends"],["nkhallik","je te laisse"],
+["3lech","pourquoi"],["kifech","comment"],["mech","ne… pas"],["ma3ech","plus jamais"],["bech","pour / va"],["wa9tech","quand"],
+["lyoum","aujourd'hui"],["noum","sommeil"],["goum","lève-toi"],["loum","reproche"],["hmoum","soucis"],["ma3loum","bien sûr"],
+["khouya","mon frère"],["liya","pour moi"],["3liya","sur moi"],["fiya","en moi"],["m3aya","avec moi"],["chwaya","un peu"],["dounya","le monde"],["hdiya","cadeau"],
+["nass","les gens"],["rass","tête"],["kass","verre"],["labass","ça va"],["khlass","c'est fini"],["7ass","il a senti"],
+["s7ab","les amis"],["bab","porte"],["ktab","livre"],["klab","chiens"],["chbab","jeunesse"],["jwab","réponse"],
+["zouz","deux"],["louz","amandes"],["nfouz","je gagne"],["3jouz","vieille"],["ijouz","ça passe"],
+["zin","beauté"],["mnin","d'où"],["3ichrin","vingt"],["msakin","pauvres"],["khamsin","cinquante"],["lithnin","lundi"],
+["barra","dehors"],["kora","foot"],["mara","femme"],["9ra","il a étudié"],["zyara","visite"]];
+
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const AR=/[ء-ي]/;
+const arNorm=w=>String(w).replace(/[ً-ْـ]/g,'').replace(/[أإآٱ]/g,'ا').replace(/[^ء-ي]/g,'');
+const norm=w=>AR.test(w)?'ar:'+arNorm(w):String(w).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'');
+const TL={'ا':'a','ى':'a','ة':'a','ء':'a','ئ':'i','ؤ':'ou','ب':'b','ت':'t','ث':'th','ج':'j','ح':'7','خ':'kh','د':'d','ذ':'dh','ر':'r','ز':'z','س':'s','ش':'ch','ص':'s','ض':'dh','ط':'t','ظ':'dh','ع':'3','غ':'gh','ف':'f','ق':'9','ك':'k','ل':'l','م':'m','ن':'n','ه':'h'};
+function translit(raw){
+  let a=arNorm(raw);if(a.length>4&&a.startsWith('ال'))a=a.slice(2);
+  const ch=[...a];let out='';
+  ch.forEach((c,i)=>{const nx=ch[i+1],cons=i===0||(nx&&'اةى'.includes(nx));
+    if(c==='و')out+=cons?'w':'ou';else if(c==='ي')out+=(cons||nx==='و')?'y':'i';else out+=TL[c]||''});
+  return out;
+}
+const VALID=/^(?:[a-zA-Z0-9]{2,20}|[ء-يً-ْـ]{2,20})$/;
+function ending(raw){
+  let w=(AR.test(raw)?translit(raw):norm(raw)).replace(/([a-z])\1+/g,'$1');
+  if(w.length>3&&/[^aeiou]e$/.test(w))w=w.slice(0,-1);
+  const m=w.match(/([^aeiou]?)([aeiou]+)([^aeiou]*)$/);
+  if(!m)return w.slice(-2);
+  const v=m[2].replace(/ou|o|u/g,'ou').replace(/e/g,'a');
+  return m[3]?v+m[3]:m[1]+v;
+}
+
+
+const TOPICS=[["l7ouma","le quartier"],["flouss","l'argent"],["lkora","le foot"],["lbhar","la mer"],["l9ahwa","le café"],["l9raya","les études"],["s7abi","mes amis"],["Tounes","la Tunisie"],["l7ob","l'amour"],["lkhedma","le travail"],["l3ers","le mariage"],["lmakla","la bouffe"],["lbled","le pays"],["ssif","l'été"]];
+
+/* ---------- words state ---------- */
+let shared=[];
+let isOwner=false,canWrite=true,db=null,col=null,uid=null;
+function allWords(){
+  const seen=new Set(),out=[];
+  for(const [w,g] of BASE){const k=norm(w);if(!seen.has(k)){seen.add(k);out.push({w,g})}}
+  for(const s of shared){const k=norm(s.w);if(k.length>1&&!seen.has(k)){seen.add(k);out.push({w:s.w,g:s.g||''})}}
+  return out;
+}
+function families(){const f={};for(const x of allWords()){(f[ending(x.w)]??=[]).push(x)}return f}
+let fam=null,queue=[],cur=null,barsOnFam=0;
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+function pickFam(){
+  const f=families(),keys=Object.keys(f).filter(k=>f[k].length>=3&&k!==fam);
+  fam=keys[Math.random()*keys.length|0];queue=shuffle(f[fam]);barsOnFam=0;
+}
+const limit=()=>+$('bars').value;
+let left=false;
+function leaveCard(){left=true;for(const o of [...$('wbox').children]){if(!o.classList.contains('w-out')){o.className='w-out';setTimeout(()=>o.remove(),200)}}}
+function showCard(big,small,cls){
+  const box=$('wbox');
+  for(const o of [...box.children]){if(o.classList.contains('w-out')){o.remove();continue}o.className='w-out';setTimeout(()=>o.remove(),200)}
+  const d=document.createElement('div');d.className='w-in';
+  const a=document.createElement('div');a.className=cls||'word';a.dir='auto';a.textContent=big;d.appendChild(a);
+  if(small!=null){const b=document.createElement('div');b.className='gloss';b.textContent=small||' ';d.appendChild(b)}
+  box.appendChild(d);
+}
+function renderStrip(){
+  const left=limit()-barsOnFam,ups=queue.slice(0,Math.max(0,Math.min(3,left)));
+  $('strip').innerHTML='<small>Up next</small>'+ups.map(x=>'<span class="up" dir="auto">'+esc(x.w)+'</span>').join('')+(ups.length<3?'<span class="up new">new sound</span>':'');
+}
+function nextWord(forceFam){
+  if(!fam||forceFam||barsOnFam>=limit())pickFam();
+  if(!queue.length)queue=shuffle(families()[fam].filter(x=>!cur||x.w!==cur.w));
+  cur=queue.shift();barsOnFam++;
+  if(!queue.length)queue=shuffle(families()[fam].filter(x=>x.w!==cur.w));
+  showCard(cur.w,cur.g);
+  $('fam').textContent='Rhyme on -'+fam+' · '+barsOnFam+'/'+limit();
+  renderStrip();
+}
+
+/* ---------- audio ---------- */
+const mid=m=>440*2**((m-69)/12);
+const STYLES=[
+{id:'boombap',name:'Boom bap',sub:'90s New York feel · 90 BPM',bpm:90,swing:.16,kick:'x.....x...x.....',snare:'....x.......x...',hat:'x.x.x.x.x.x.x.x.',open:'..............x.',chords:[[53,56,60,63],[51,55,58,62]],bass:[41,39],inst:'keys'},
+{id:'trap',name:'Trap',sub:'Atlanta bounce · 140 BPM',bpm:140,swing:0,kick:'x......x..x.....',snare:'........x.......',hat:'x.xxx.x.x.xxx.xx',roll:[13,14,15],chords:[[57,60,64],[53,57,60],[55,59,62],[52,55,59]],bass:[33,29,31,28],b808:1,inst:'bell'},
+{id:'drill',name:'Drill',sub:'UK / NY slide · 142 BPM',bpm:142,swing:0,kick:'x.........x.....',snare:'........x..x....',hat:'x..x..x...x..x..',chords:[[56,59,63],[54,58,61]],bass:[32,30],b808:1,glide:5,inst:'pad'},
+{id:'mezoued',name:'Mezoued',sub:'Tounsi darbouka · 100 BPM',bpm:100,swing:.08,doum:'x.......x.......',tek:'..x...x.....x...',ghost:'.x.x.x.x.x.x.x.x',mel:[[74,0,72,70,69,0,70,0,69,0,67,0,66,0,67,0],[66,0,67,0,69,0,66,0,63,0,62,0,63,0,62,0]],bass:[38,38]},
+{id:'lofi',name:'Lo-fi',sub:'Chill late-night · 80 BPM',bpm:80,swing:.2,kick:'x......x..x.....',rim:'....x.......x...',hat:'..x...x...x...x.',chords:[[60,64,67,71],[57,60,64,67],[62,65,69,72],[55,59,62,65]],bass:[36,33,38,31],inst:'keys',vinyl:1}];
+let style=STYLES[0],mode='synth',ctx=null,master=null,noiseBuf=null,playing=false,timer=null,nextT=0,step=0,bar=0,vis=[],vinylSrc=null;
+function initAudio(){
+  if(ctx)return;
+  ctx=new (window.AudioContext||window.webkitAudioContext)();
+  const comp=ctx.createDynamicsCompressor();master=ctx.createGain();master.gain.value=+$('vol').value;
+  master.connect(comp);comp.connect(ctx.destination);
+  noiseBuf=ctx.createBuffer(1,ctx.sampleRate,ctx.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+}
+function env(g,t,a,v,dec){g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(v,t+a);g.gain.exponentialRampToValueAtTime(0.0001,t+a+dec)}
+function osc(type,f,t,dur,v,dest,filt){const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;o.frequency.setValueAtTime(f,t);env(g,t,.005,v,dur);o.connect(g);let out=g;if(filt){const fl=ctx.createBiquadFilter();fl.type='lowpass';fl.frequency.value=filt;g.connect(fl);out=fl}out.connect(dest||master);o.start(t);o.stop(t+dur+.05);return o}
+function noise(t,dur,v,type,freq,q){const s=ctx.createBufferSource(),f=ctx.createBiquadFilter(),g=ctx.createGain();s.buffer=noiseBuf;f.type=type;f.frequency.value=freq;if(q)f.Q.value=q;env(g,t,.001,v,dur);s.connect(f);f.connect(g);g.connect(master);s.start(t);s.stop(t+dur+.05)}
+const kick=(t,v=1)=>{const o=osc('sine',150,t,.4,v);o.frequency.exponentialRampToValueAtTime(42,t+.12)};
+const snare=t=>{noise(t,.18,.55,'highpass',1400);osc('triangle',190,t,.09,.3)};
+const hat=(t,v=.18)=>noise(t,.035,v,'highpass',7500);
+const ohat=t=>noise(t,.22,.14,'highpass',7000);
+const rim=t=>{noise(t,.05,.35,'bandpass',2200,4);osc('square',820,t,.03,.08)};
+const doum=t=>{const o=osc('sine',95,t,.35,.9);o.frequency.exponentialRampToValueAtTime(58,t+.2)};
+const tek=(t,v=.5)=>{noise(t,.06,v,'bandpass',3200,2);osc('sine',420,t,.04,v*.4)};
+function b808(t,f,dur,glide){const o=ctx.createOscillator(),g=ctx.createGain(),ws=ctx.createWaveShaper(),c=new Float32Array(256);for(let i=0;i<256;i++){const x=i/128-1;c[i]=Math.tanh(2.2*x)}ws.curve=c;o.type='sine';o.frequency.setValueAtTime(f,t);if(glide)o.frequency.exponentialRampToValueAtTime(f*2**(glide/12),t+dur*.6);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.7,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(ws);ws.connect(g);g.connect(master);o.start(t);o.stop(t+dur+.05)}
+function chord(t,notes,dur,inst){for(const n of notes){if(inst==='bell'){osc('sine',mid(n+12),t,.9,.06);osc('sine',mid(n+12),t+dur/2,.9,.05)}else if(inst==='pad'){const o=osc('sawtooth',mid(n),t,dur,.035,null,900)}else{osc('triangle',mid(n),t,dur*.9,.07,null,1800)}}}
+function playStep(s,i,b,t,sd){
+  const on=p=>p&&p[i]==='x';
+  if(on(s.kick)){kick(t);const r=s.bass[b%s.bass.length];if(s.b808)b808(t,mid(r),sd*(i===0?6:4),s.glide&&i>0?s.glide:0);else osc('sine',mid(r),t,sd*3,.45)}
+  if(on(s.snare))snare(t);
+  if(on(s.rim))rim(t);
+  if(on(s.hat))hat(t,s.vinyl?.1:.18);
+  if(on(s.open))ohat(t);
+  if(s.roll&&s.roll.includes(i)&&b%2===1){hat(t+sd/3,.12);hat(t+2*sd/3,.12)}
+  if(on(s.doum)){doum(t);if(i===0)osc('sine',mid(s.bass[0]),t,sd*6,.35)}
+  if(on(s.tek))tek(t);
+  if(on(s.ghost))tek(t,.12);
+  if(s.mel){const n=s.mel[b%s.mel.length][i];if(n)osc('sawtooth',mid(n),t,sd*1.6,.05,null,2400)}
+  if(s.chords&&i===0)chord(t,s.chords[b%s.chords.length],sd*16,s.inst);
+}
+
+let speed=1,clock=null;
+function startClock(){try{clock=new Worker(URL.createObjectURL(new Blob(['let i;onmessage=e=>{clearInterval(i);if(e.data)i=setInterval(()=>postMessage(0),25)}'],{type:'text/javascript'})));clock.onmessage=schedule;clock.postMessage(1)}catch(e){clock=null;timer=setInterval(schedule,25)}}
+function stopClock(){if(clock){clock.postMessage(0);clock.terminate();clock=null}clearInterval(timer)}
+const bpmIn=()=>Math.max(50,Math.min(200,+$('bpm').value||90));
+const bpmNow=()=>mode==='synth'?style.bpm*speed:mode==='yt'?bpmIn():bpmIn()*speed;
+const beatLabel=()=>mode==='synth'?style.name:mode==='yt'?'YouTube beat':'your file';
+let t0=0;
+function schedule(){
+  const sd=60/(style.bpm*speed)/4;
+  if(nextT<ctx.currentTime-.03){const sd0=sd;while(nextT<ctx.currentTime+.03){nextT+=sd0;step++;if(step===16){step=0;bar++}}vis=[]}
+  while(nextT<ctx.currentTime+.15){
+    const t=nextT+(step%2?style.swing*sd:0);
+    playStep(style,step,bar,t,sd);
+    if(step%4===0)vis.push({t,beat:step/4});
+    nextT+=sd;step++;if(step===16){step=0;bar++}
+  }
+}
+function vinyl(on){
+  if(vinylSrc){try{vinylSrc.stop()}catch(e){}vinylSrc=null}
+  if(!on)return;
+  const len=ctx.sampleRate*2,b=ctx.createBuffer(1,len,ctx.sampleRate),d=b.getChannelData(0);
+  for(let i=0;i<len;i++)d[i]=(Math.random()<.0008?(Math.random()*2-1)*.6:0)+(Math.random()*2-1)*.012;
+  vinylSrc=ctx.createBufferSource();vinylSrc.buffer=b;vinylSrc.loop=true;vinylSrc.connect(master);vinylSrc.start();
+}
+
+/* ---------- challenge ---------- */
+const TOTAL=16;
+let chal=false;const ch={bar:-1,score:0,streak:0,best:0,hit:false,topic:null};
+function setMode(c){
+  if(playing)stop();chal=c;
+  $('mFree').setAttribute('aria-pressed',!c);$('mChal').setAttribute('aria-pressed',c);
+  $('hud').hidden=!c;$('hitBtn').hidden=!c;$('topic').hidden=!c;
+  showCard(c?'Ready?':'Yalla',c?'16 bars · a new topic every 8 · tap “Got it!” each time you land the word':'Press play and get ready');
+}
+$('mFree').addEventListener('click',()=>setMode(false));
+$('mChal').addEventListener('click',()=>setMode(true));
+function hud(){$('hScore').textContent=ch.score;$('hStreak').textContent=ch.streak;$('hBar').textContent=ch.bar>0?Math.min(ch.bar,TOTAL)+'/'+TOTAL:'–'}
+function fly(txt,bad){const f=document.createElement('div');f.className='fly'+(bad?' bad':'');f.textContent=txt;$('tile').appendChild(f);setTimeout(()=>f.remove(),950)}
+function newTopic(){const t=TOPICS.filter(x=>!ch.topic||x[0]!==ch.topic[0]);ch.topic=t[Math.random()*t.length|0];$('topic').textContent='Topic: '+ch.topic[0]+' ('+ch.topic[1]+')'}
+function hit(){
+  if(!chal||!playing||ch.bar<1||ch.bar>TOTAL||ch.hit)return;
+  ch.hit=true;ch.score++;ch.streak++;ch.best=Math.max(ch.best,ch.streak);
+  fly(ch.streak>=3?'COMBO ×'+ch.streak:'+1');$('hitBtn').disabled=true;hud();
+}
+$('hitBtn').addEventListener('click',hit);
+const RANKS=[[16,'Malek el freestyle!'],[13,'Ma7lek!'],[9,'Mzyen barcha'],[5,'Mouch khayeb'],[0,'Mbtadi — 3awed!']];
+function endChallenge(){
+  stop();
+  let best=0;try{best=+localStorage.getItem('ft-best')||0;if(ch.score>best)localStorage.setItem('ft-best',ch.score)}catch(e){}
+  $('resScore').textContent=ch.score+'/'+TOTAL;
+  $('resRank').textContent=RANKS.find(r=>ch.score>=r[0])[1];
+  $('resTopic').textContent='Beat: '+beatLabel()+' · speed ×'+speed.toFixed(2);
+  $('resMore').textContent='Best streak: '+ch.best+(ch.score>best&&best>0?' · New personal best!':best?' · Your best: '+best:'');
+  try{$('result').showModal()}catch(e){$('result').setAttribute('open','')}
+}
+$('again').addEventListener('click',()=>{$('result').close();start()});
+$('resClose').addEventListener('click',()=>$('result').close());
+
+/* ---------- ticks ---------- */
+const lamps=[...document.querySelectorAll('.lamp')];
+let barStart=0,barDur=1;
+function pulse(one){const g=$('glow');g.className='glow';void g.offsetWidth;g.className='glow go'+(one?' one':'')}
+function tick(beat,now){
+  lamps.forEach((l,i)=>{l.classList.remove('on');if(i===beat){void l.offsetWidth;l.classList.add('on')}});
+  pulse(beat===0);
+  if(beat!==0){if(chal&&ch.bar===0)showCard(['','3','2','1'][beat],null,'count');return}
+  barStart=now;barDur=4*60/bpmNow();left=false;
+  if(!chal){nextWord();return}
+  if(ch.bar>=1&&!ch.hit){ch.streak=0;const t=$('tile');t.classList.remove('miss');void t.offsetWidth;t.classList.add('miss');fly('miss',true)}
+  ch.bar++;ch.hit=false;
+  if(ch.bar>TOTAL){hud();endChallenge();return}
+  if(ch.bar===0){showCard('4',null,'count');$('hitBtn').disabled=true;hud();return}
+  if((ch.bar-1)%8===0)newTopic();
+  nextWord();$('hitBtn').disabled=false;hud();
+}
+
+/* own beat */
+const audio=new Audio();let lastBeat=-1,taps=[];
+$('file').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;if(playing)stop();audio.src=URL.createObjectURL(f);mode='file';
+  $('ownHint').textContent='Loaded: '+f.name+' — set the BPM, then press Play.';renderBeats();updStat()});
+$('bpm').addEventListener('input',updStat);
+$('tap').addEventListener('click',()=>{const n=performance.now();taps=taps.filter(x=>n-x<3000);taps.push(n);
+  if(taps.length>=3){const iv=(taps.at(-1)-taps[0])/(taps.length-1);$('bpm').value=Math.round(60000/iv);updStat()}});
+
+function loop(){
+  if(!playing)return;
+  let now;
+  if(mode==='synth'){now=ctx.currentTime;const lat=(ctx.outputLatency||ctx.baseLatency||0);let due=[];while(vis.length&&vis[0].t+lat<=now)due.push(vis.shift());
+    if(due.length){const last=due[due.length-1];if(last.beat!==0&&due.some(d=>d.beat===0))tick(0,now);tick(last.beat,now)}}
+  else if(mode==='yt'){now=performance.now()/1000;const bpm=bpmIn();const b=Math.floor((now-t0)*bpm/60);if(b!==lastBeat){lastBeat=b;tick(((b%4)+4)%4,t0+b*60/bpm)}}
+  else{now=audio.currentTime;const bpm=Math.max(50,Math.min(200,+$('bpm').value||90));const b=Math.floor(now*bpm/60);if(b!==lastBeat){lastBeat=b;tick(b%4,b*60/bpm)}}
+  const span=mode==='file'?barDur*speed:barDur;
+  const fr=Math.max(0,Math.min(1,(now-barStart)/span));$('prog').style.width=fr*100+'%';
+  if(fr>=.92&&!left&&barStart>0)leaveCard();
+  requestAnimationFrame(loop);
+}
+function start(){
+  initAudio();ctx.resume();playing=true;$('play').textContent='■ Stop';fam=null;
+  if(chal){Object.assign(ch,{bar:-1,score:0,streak:0,best:0,hit:false,topic:null});hud();$('topic').textContent='Topic: get ready'}
+  if(mode==='synth'){nextT=ctx.currentTime+.08;step=0;bar=0;vis=[];schedule();startClock();vinyl(style.vinyl)}
+  else if(mode==='yt'){t0=performance.now()/1000;lastBeat=-1}
+  else{audio.currentTime=0;lastBeat=-1;audio.playbackRate=speed;audio.volume=+$('vol').value;audio.play().catch(()=>{$('ownHint').textContent='Could not play this file.';stop()})}
+  requestAnimationFrame(loop);
+}
+function stop(){playing=false;stopClock();vis=[];if(ctx)vinyl(false);audio.pause();lamps.forEach(l=>l.classList.remove('on'));$('play').textContent='▶ Play';$('prog').style.width='0';$('hitBtn').disabled=true}
+$('play').addEventListener('click',()=>playing?stop():start());
+$('skip').addEventListener('click',()=>{if(!chal||ch.bar>=1)nextWord(true)});
+$('vol').addEventListener('input',e=>{if(master)master.gain.value=+e.target.value;audio.volume=+e.target.value});
+$('speed').addEventListener('input',e=>{
+  const was=playing&&mode==='synth';speed=+e.target.value;$('speedTxt').textContent='×'+speed.toFixed(2);
+  audio.playbackRate=speed;updStat();
+  if(was){/* keep grid: next steps use new tempo automatically */}
+});
+document.addEventListener('keydown',e=>{
+  if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)||document.querySelector('dialog[open]')||!$('tour').hidden)return;
+  if(e.code==='Space'&&e.target.tagName!=='BUTTON'){e.preventDefault();playing?stop():start()}
+  if(e.key==='g'||e.key==='G'||e.key==='Enter'&&chal&&e.target.tagName!=='BUTTON'){e.preventDefault();hit()}
+});
+
+function updStat(){$('stat').textContent='Beat: '+beatLabel()+' · '+Math.round(bpmNow())+' BPM';$('ytSync').hidden=mode!=='yt';$('ytUse').setAttribute('aria-pressed',mode==='yt');$('ytUse').textContent=mode==='yt'?'Using YouTube beat ✓':'Use my YouTube beat'}
+const YTQ=[['Tunisian rap','tunisian rap beat instrumental'],['Boom bap','boom bap beat instrumental'],['Trap','trap beat instrumental'],['Drill','drill beat instrumental'],['Mezoued','mezoued tounsi instrumental'],['Lo-fi','lofi hip hop beat instrumental']];
+const ytUrl=q=>'https://www.youtube.com/results?search_query='+encodeURIComponent(q);
+$('ytChips').innerHTML=YTQ.map(([n,q])=>'<a class="chip" target="_blank" rel="noopener" style="text-decoration:none;color:inherit" href="'+esc(ytUrl(q))+'">'+esc(n)+'</a>').join('');
+const ytSet=()=>{$('ytGo').href=ytUrl($('ytQ').value.trim()||'rap beat instrumental')};ytSet();
+$('ytQ').addEventListener('input',ytSet);
+$('ytQ').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();ytSet();$('ytGo').click()}});
+$('ytUse').addEventListener('click',()=>{if(playing)stop();mode='yt';renderBeats();updStat();$('ytHint').textContent='Ready: press Play, then hit “Sync on the 1” when the beat drops.'});
+$('ytSync').addEventListener('click',()=>{if(!playing||mode!=='yt')return;t0=performance.now()/1000;lastBeat=-1});
+function renderBeats(){
+  $('beats').innerHTML=STYLES.map(s=>'<button class="beat" data-id="'+s.id+'" aria-pressed="'+(mode==='synth'&&s===style)+'"><strong>'+s.name+'</strong><span>'+s.sub+'</span></button>').join('');
+}
+$('beats').addEventListener('click',e=>{const b=e.target.closest('.beat');if(!b)return;const was=playing;if(was)stop();
+  style=STYLES.find(s=>s.id===b.dataset.id);mode='synth';renderBeats();updStat();if(was)start()});
+renderBeats();
+
+/* ---------- word wall ---------- */
+function renderWall(){
+  const recent=shared.slice(0,40);
+  $('chips').innerHTML=recent.map(s=>'<span class="chip">'+esc(s.w)+(s.g?' <i>'+esc(s.g)+'</i>':'')+(isOwner&&s.id?'<button data-del="'+esc(s.id)+'" aria-label="Remove '+esc(s.w)+'">×</button>':'')+'</span>').join('');
+  const f=families(),keys=Object.keys(f).sort((a,b)=>f[b].length-f[a].length);
+  $('fams').innerHTML=keys.filter(k=>f[k].length>=2).map(k=>'<div class="fbox"><b>-'+esc(k)+' · '+f[k].length+'</b>'+f[k].map(x=>esc(x.w)).join(', ')+(f[k].length<3?' <span class="muted">(needs 3 to play)</span>':'')+'</div>').join('');
+}
+$('chips').addEventListener('click',async e=>{const id=e.target.dataset&&e.target.dataset.del;if(!id||!col)return;try{await col.doc(id).delete()}catch(err){$('wallHint').textContent='Could not remove that word.'}});
+let busy=false,readyFn;const dbReady=new Promise(r=>readyFn=r);
+function bindAdd(form,wi,gi,hint,btn,onDone){
+  const H=$(hint);
+  $(wi).addEventListener('input',()=>{const v=$(wi).value.trim();H.innerHTML=v?(VALID.test(v)?'Rhymes on <b>-'+esc(ending(v))+'</b>':'One word only: Latin letters (with 3, 7, 9) or Arabic letters.'):'One word, 2 to 20 letters.'});
+  $(form).addEventListener('submit',async e=>{
+    e.preventDefault();if(busy)return;
+    const w=$(wi).value.trim(),g=$(gi).value.trim().slice(0,40);
+    if(!VALID.test(w)){H.textContent='One word only, 2 to 20 letters: Latin (with 3, 7, 9) or Arabic.';return}
+    if(allWords().some(x=>norm(x.w)===norm(w))){H.textContent='That word is already on the wall.';return}
+    busy=true;$(btn).disabled=true;H.textContent='Saving…';
+    await Promise.race([dbReady,new Promise(r=>setTimeout(r,10000))]);
+    let ok=false;
+    if(localMode){shared.unshift({w,g,at:Date.now()});try{localStorage.setItem('ft-words',JSON.stringify(shared.slice(0,300)))}catch(e){}renderWall();H.innerHTML='Saved in this browser · rhymes on <b>-'+esc(ending(w))+'</b>';ok=true}
+    else if(!col||!canWrite){shared.unshift({w,g,at:Date.now()});renderWall();H.textContent='Added for this visit only (shared saving is not available for you here).';ok=true}
+    else try{await col.add({w,g,at:Date.now(),by:uid||''});H.innerHTML='Added! Rhymes on <b>-'+esc(ending(w))+'</b>';ok=true}
+    catch(err){if(err&&err.code==='invalid_argument'){canWrite=false;H.textContent='You can view the wall but not add words with your access.'}
+      else if(err&&err.code==='quota_exceeded')H.textContent='The word wall is full.';
+      else H.textContent='Could not save, try again.'}
+    if(ok){$(wi).value='';$(gi).value='';if(onDone)onDone(w)}
+    busy=false;$(btn).disabled=false;
+  });
+}
+bindAdd('add','w','g','addHint','addBtn');
+const dlg=$('pop');
+bindAdd('padd','pw','pg','pHint','pBtn',w=>setTimeout(()=>{dlg.close();$('addHint').innerHTML='Thanks! <b>'+esc(w)+'</b> is on the wall.'},900));
+$('pSkip').addEventListener('click',()=>dlg.close());
+/* ---------- tour ---------- */
+const TOUR=[
+ ['#tile','The word card','Every 4 ticks (one bar) a new Tunisian word drops here, with its meaning. Rap a line that ends on it. The tag on top shows the sound to rhyme on, like -ar.'],
+ ['.lamps','The beat lights','They light up on each tick: 1, 2, 3, 4. The red light is beat 1 — that’s when the new word lands.'],
+ ['#strip','Bar line and Up next','The line fills up during the bar so you see when the word is about to change. “Up next” shows the next words so you can prepare your rhyme.'],
+ ['.seg','Free style or Challenge','Free style: just practice. Challenge: 16 bars with a topic. Tap “Got it!” (or press G) each time you really use the word — build combos and get your rank at the end.'],
+ [()=>$('play').parentElement,'Play and Skip','Play starts the beat and the words (or press Space). Skip word jumps to a new rhyme sound if you’re stuck.'],
+ [()=>$('speed').closest('.side'),'Speed and settings','Speed makes the beat slower or faster. “New sound every” sets how many bars you keep the same rhyme sound. Volume is the beat loudness.'],
+ ['#beats','Choose your beat','Five beats made right here: Boom bap, Trap, Drill, Mezoued and Lo-fi. Tap one to switch.'],
+ ['#yt','Your own beat or YouTube','Load an MP3, or search a beat on YouTube, play it there, tap the tempo and press “Use my YouTube beat”. “Sync on the 1” lines the words up with the music.'],
+ ['#add','Zid kelma','Add Tunisian words in Arabic or Latin letters (3, 7, 9). They go on the word wall and into everyone’s freestyle.'],
+ ['#fams','The word wall','All the words, grouped by rhyme sound. A sound needs 3 words before it comes up in the freestyle. Yalla, à toi!']];
+let ti=0,tourEl=null;
+const tGet=i=>{const x=TOUR[i][0];return typeof x==='function'?x():document.querySelector(x)};
+function tPlace(){
+  if($('tour').hidden||!tourEl)return;
+  const r=tourEl.getBoundingClientRect(),p=8,vw=innerWidth,vh=innerHeight,sp=$('tSpot'),c=$('tCard');
+  const top=Math.max(4,r.top-p),h=Math.min(r.height+2*p,vh-8-top);
+  Object.assign(sp.style,{left:(r.left-p)+'px',top:top+'px',width:(r.width+2*p)+'px',height:h+'px'});
+  const ch=c.offsetHeight,cw=c.offsetWidth;let y=top+h+12;
+  if(y+ch>vh-8)y=top-ch-12;if(y<8)y=vh-ch-8;
+  const x=Math.max(12,Math.min(vw-cw-12,r.left));
+  c.style.top=y+'px';c.style.left=x+'px';
+}
+function tShow(i){
+  ti=i;tourEl=tGet(i);const [,t,d]=TOUR[i];
+  $('tT').textContent=t;$('tD').textContent=d;
+  $('tDots').innerHTML=TOUR.map((_,k)=>'<i class="'+(k===i?'on':'')+'"></i>').join('');
+  $('tBack').hidden=i===0;$('tNext').textContent=i===TOUR.length-1?'Yalla!':'Next';
+  const r=tourEl.getBoundingClientRect();
+  if(r.top<70||r.bottom>innerHeight-200)tourEl.scrollIntoView({block:r.height>innerHeight*.6?'start':'center',behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});
+  tPlace();setTimeout(tPlace,380);setTimeout(tPlace,700);$('tNext').focus({preventScroll:true});
+}
+function tourOpen(){if(playing)stop();$('tour').hidden=false;tShow(0)}
+function tourClose(){$('tour').hidden=true;try{localStorage.setItem('ft-tour','1')}catch(e){}scrollTo({top:0,behavior:'smooth'});$('play').focus({preventScroll:true})}
+$('tNext').addEventListener('click',()=>ti<TOUR.length-1?tShow(ti+1):tourClose());
+$('tBack').addEventListener('click',()=>ti>0&&tShow(ti-1));
+$('tSkip').addEventListener('click',tourClose);
+$('howto').addEventListener('click',tourOpen);
+addEventListener('resize',tPlace);addEventListener('scroll',tPlace,{passive:true});
+document.addEventListener('keydown',e=>{if($('tour').hidden)return;if(e.key==='Escape')tourClose();else if(e.key==='ArrowRight')$('tNext').click();else if(e.key==='ArrowLeft')$('tBack').click()},true);
+dlg.addEventListener('close',()=>{let seen=false;try{seen=localStorage.getItem('ft-tour')==='1'}catch(e){}if(!seen)setTimeout(tourOpen,250)});
+try{dlg.showModal()}catch(e){dlg.setAttribute('open','')}
+renderWall();
+
+
+const localMode=typeof window.claude==='undefined'||!window.claude||typeof window.claude.use!=='function';
+if(localMode){
+  readyFn();
+  try{const a=JSON.parse(localStorage.getItem('ft-words')||'[]');if(Array.isArray(a))shared=a.filter(x=>x&&typeof x.w==='string'&&VALID.test(x.w)).map(x=>({w:x.w,g:typeof x.g==='string'?x.g.slice(0,40):'',at:+x.at||0}))}catch(e){}
+  $('wallHint').textContent=shared.length?shared.length+' word'+(shared.length>1?'s':'')+' you added (saved in this browser)':'Words you add are saved in this browser.';
+  renderWall();
+}
+if(!localMode)(async()=>{
+  const loadT=setTimeout(()=>{$('wallHint').textContent='Shared words can’t be reached right now — starter words still work.'},10000);
+  try{
+    const u=await claude.use('user');
+    if(u){try{uid=await u.id()}catch(e){}try{isOwner=!!(await u.isOwner())}catch(e){}try{const c=await u.can('data.write');if(c===false)canWrite=false}catch(e){}}
+    db=await claude.use('db');
+    if(!db){readyFn();clearTimeout(loadT);$('wallHint').textContent='Sign in to see and share words with others. Starter words are ready.';return}
+    col=db.collection('words');readyFn();
+    col.orderBy('at','desc').limit(500).onSnapshot(snap=>{
+      if(!snap.metadata.fromCache)clearTimeout(loadT);
+      shared=snap.docs.map(d=>{const x=d.data()||{};return{id:d.id,w:typeof x.w==='string'?x.w.slice(0,20):'',g:typeof x.g==='string'?x.g.slice(0,40):'',at:+x.at||0}}).filter(x=>VALID.test(x.w));
+      $('wallHint').textContent=shared.length?shared.length+' word'+(shared.length>1?'s':'')+' added by visitors'+(canWrite?'':' · view only'):'No visitor words yet — be the first!';
+      renderWall();
+    },err=>{clearTimeout(loadT);$('wallHint').textContent='Shared words unavailable right now.'});
+  }catch(e){readyFn();clearTimeout(loadT);$('wallHint').textContent='Shared words unavailable right now.'}
+})();
+
+}
+</script>
+</body>
+</html>
