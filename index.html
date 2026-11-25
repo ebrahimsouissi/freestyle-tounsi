@@ -300,7 +300,7 @@ body{padding-bottom:92px}
   <div class="npTxt"><strong id="npName">Boom bap</strong><span id="npSub">Freestyle Tounsi · 90 BPM</span></div>
   <button class="npBtn" id="npPlay" aria-label="Play">▶</button>
 </div>
-<footer class="band" style="padding-top:0"><div class="wrap">Starter words are in Tunisian Arabizi with French meanings. Words added by visitors are shared with everyone who opens this page. Challenge mode is honest-play: tap “Got it!” (or press G) when you really used the word in that bar.</div></footer>
+<footer class="band" style="padding-top:0"><div class="wrap">Starter words are in Tunisian Arabizi with French meanings. <span id="shareNote">Words added by visitors are shared with everyone who opens this page.</span> Challenge mode is honest-play: tap “Got it!” (or press G) when you really used the word in that bar.</div></footer>
 
 <script>
 {
@@ -329,7 +329,8 @@ function translit(raw){
     if(c==='و')out+=cons?'w':'ou';else if(c==='ي')out+=(cons||nx==='و')?'y':'i';else out+=TL[c]||''});
   return out;
 }
-const VALID=/^(?:[a-zA-Z0-9]{2,20}|[ء-يً-ْـ]{2,20})$/;
+const VALID0=/^(?:[a-zA-Z0-9]{2,20}|[ء-يً-ْـ]{2,20})$/;
+const VALID={test:v=>VALID0.test(v)&&/[A-Za-z\u0621-\u064A]/.test(v)};
 function ending(raw){
   let w=(AR.test(raw)?translit(raw):norm(raw)).replace(/([a-z])\1+/g,'$1');
   if(w.length>3&&/[^aeiou]e$/.test(w))w=w.slice(0,-1);
@@ -627,6 +628,17 @@ function renderWall(){
   $('fams').innerHTML=keys.filter(k=>f[k].length>=2).map(k=>'<div class="fbox"><b>-'+esc(k)+' · '+f[k].length+'</b>'+f[k].map(x=>esc(x.w)).join(', ')+(f[k].length<3?' <span class="muted">(needs 3 to play)</span>':'')+'</div>').join('');
 }
 $('chips').addEventListener('click',async e=>{const id=e.target.dataset&&e.target.dataset.del;if(!id||!col)return;try{await col.doc(id).delete()}catch(err){$('wallHint').textContent='Could not remove that word.'}});
+const SUPA={url:'https://nqsibygdyxgzwtlpbchz.supabase.co',key:'sb_publishable_XIL4_iE7PsrqMK0kX3A1_A_Xh5O3hfd'};
+const remote=!!(SUPA.url&&SUPA.key);
+const sHdr=()=>{const h={apikey:SUPA.key,'Content-Type':'application/json'};if(SUPA.key.startsWith('eyJ'))h.Authorization='Bearer '+SUPA.key;return h};
+function addedMsg(w){const e=ending(w),n=(families()[e]||[]).length;return n>=3?'Added! It’s in the <b>-'+esc(e)+'</b> rhymes now.':'Added! The <b>-'+esc(e)+'</b> sound needs '+(3-n)+' more word'+(3-n>1?'s':'')+' to come up in the freestyle.'}
+async function loadRemote(){
+  try{const r=await fetch(SUPA.url+'/rest/v1/words?select=id,w,g,at&order=at.desc&limit=1000',{headers:sHdr()});if(!r.ok)throw r.status;
+    const rows=await r.json();
+    shared=(Array.isArray(rows)?rows:[]).filter(x=>x&&typeof x.w==='string'&&VALID.test(x.w)).map(x=>({id:String(x.id),w:x.w,g:typeof x.g==='string'?x.g.slice(0,40):'',at:Date.parse(x.at)||0}));
+    $('wallHint').textContent=shared.length?shared.length+' word'+(shared.length>1?'s':'')+' added by visitors':'No visitor words yet — be the first!';renderWall();
+  }catch(e){$('wallHint').textContent='Shared words can’t be reached right now — starter words still work.'}
+}
 let busy=false,readyFn;const dbReady=new Promise(r=>readyFn=r);
 function bindAdd(form,wi,gi,hint,btn,onDone){
   const H=$(hint);
@@ -639,9 +651,12 @@ function bindAdd(form,wi,gi,hint,btn,onDone){
     busy=true;$(btn).disabled=true;H.textContent='Saving…';
     await Promise.race([dbReady,new Promise(r=>setTimeout(r,10000))]);
     let ok=false;
-    if(localMode){shared.unshift({w,g,at:Date.now()});try{localStorage.setItem('ft-words',JSON.stringify(shared.slice(0,300)))}catch(e){}renderWall();H.innerHTML='Saved in this browser · rhymes on <b>-'+esc(ending(w))+'</b>';ok=true}
+    if(localMode&&remote){try{const r=await fetch(SUPA.url+'/rest/v1/words',{method:'POST',headers:{...sHdr(),Prefer:'return=minimal'},body:JSON.stringify({w,g})});
+        if(r.status===409)H.textContent='That word is already on the wall.';else if(!r.ok)H.textContent='Could not save, try again.';else{shared.unshift({w,g,at:Date.now()});renderWall();H.innerHTML=addedMsg(w);ok=true;loadRemote()}}
+      catch(err){H.textContent='Could not save — check your connection.'}}
+    else if(localMode){shared.unshift({w,g,at:Date.now()});try{localStorage.setItem('ft-words',JSON.stringify(shared.slice(0,300)))}catch(e){}renderWall();H.innerHTML=addedMsg(w)+' (saved in this browser)';ok=true}
     else if(!col||!canWrite){shared.unshift({w,g,at:Date.now()});renderWall();H.textContent='Added for this visit only (shared saving is not available for you here).';ok=true}
-    else try{await col.add({w,g,at:Date.now(),by:uid||''});H.innerHTML='Added! Rhymes on <b>-'+esc(ending(w))+'</b>';ok=true}
+    else try{shared.unshift({w,g,at:Date.now()});const msg=addedMsg(w);shared.shift();await col.add({w,g,at:Date.now(),by:uid||''});H.innerHTML=msg;ok=true}
     catch(err){if(err&&err.code==='invalid_argument'){canWrite=false;H.textContent='You can view the wall but not add words with your access.'}
       else if(err&&err.code==='quota_exceeded')H.textContent='The word wall is full.';
       else H.textContent='Could not save, try again.'}
@@ -700,8 +715,9 @@ renderWall();
 
 
 const localMode=typeof window.claude==='undefined'||!window.claude||typeof window.claude.use!=='function';
-if(localMode){
-  readyFn();
+if(localMode&&remote){readyFn();$('wallHint').textContent='Loading shared words…';loadRemote();setInterval(()=>{if(!document.hidden)loadRemote()},30000)}
+else if(localMode){
+  readyFn();$('shareNote').textContent='Words you add are saved in this browser.';
   try{const a=JSON.parse(localStorage.getItem('ft-words')||'[]');if(Array.isArray(a))shared=a.filter(x=>x&&typeof x.w==='string'&&VALID.test(x.w)).map(x=>({w:x.w,g:typeof x.g==='string'?x.g.slice(0,40):'',at:+x.at||0}))}catch(e){}
   $('wallHint').textContent=shared.length?shared.length+' word'+(shared.length>1?'s':'')+' you added (saved in this browser)':'Words you add are saved in this browser.';
   renderWall();
