@@ -184,6 +184,20 @@ dialog::backdrop{background:rgba(2,16,30,.72)}
 .npBtn:hover{transform:scale(1.06)}.npBtn:focus-visible{outline:3px solid #ffd23f;outline-offset:2px}
 body{padding-bottom:92px}
 @media(max-width:600px){.shelf{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.sc{padding:8px 8px 12px}.spPlay{width:40px;height:40px;font-size:15px;opacity:1;transform:none}.sc>span{font-size:13px}}
+.finder{padding-top:clamp(24px,3vw,40px);padding-bottom:clamp(16px,2vw,28px)}
+.fbar{display:flex;gap:10px;margin-top:10px;max-width:640px}
+.fbar input{flex:1;min-height:56px;font-size:20px;border-radius:16px;border:2px solid var(--line);background:var(--card);color:var(--ink);padding:0 16px}
+.fbar input:focus-visible{outline:3px solid var(--vio2);outline-offset:1px}
+.fbar .btn{min-height:56px;padding:0 22px;font-size:18px}
+#fOut{margin-top:14px;display:grid;gap:12px;max-width:900px}
+.fsec{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+.fsec h3{margin:0 0 8px;font:600 15px Fredoka,sans-serif;color:var(--soft)}
+.fsec h3 b{color:var(--vio2);font-size:17px}
+.rchips{display:flex;flex-wrap:wrap;gap:8px}
+.rc{display:inline-flex;align-items:baseline;gap:6px;border-radius:999px;padding:8px 14px;background:rgba(11,95,176,.1);border:1px solid var(--line);font:600 17px Fredoka,sans-serif;color:var(--ink);animation:sIn .3s ease-out both}
+.rc i{font-style:normal;font-weight:400;font-size:13px;color:var(--soft)}
+button.rc{cursor:pointer;background:var(--vio2);color:#fff;border-color:transparent}button.rc i{color:rgba(255,255,255,.8)}
+.fsec .muted{font-size:14px}
 @media(max-width:820px){.door,.grid2{grid-template-columns:minmax(0,1fr)}.tile{min-height:300px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
@@ -253,6 +267,15 @@ body{padding-bottom:92px}
   </div>
 </section>
 
+<section class="band finder" aria-labelledby="fT"><div class="wrap">
+  <h2 id="fT">Find a rhyme</h2>
+  <p class="muted">Type any word — Arabic or Latin letters — and its rhymes show up right away.</p>
+  <form class="fbar" id="fForm" autocomplete="off">
+    <input type="text" id="fq" dir="auto" maxlength="20" placeholder="Type a word, e.g. 9alb or قلب" aria-label="Word to rhyme">
+    <button class="btn gold" type="submit" id="fGo">Find</button>
+  </form>
+  <div id="fOut" aria-live="polite"></div>
+</div></section>
 <section class="band sp"><div class="wrap">
   <div class="spHead"><h2>Choose your beat</h2><span class="muted">14 beats · made in your browser</span></div>
   <p class="muted">Tap a cover to pick it, or hit the round play button to start right away. Want a famous instrumental? Load your own MP3 or find one on YouTube below.</p>
@@ -627,6 +650,47 @@ $('lvl').addEventListener('change',()=>{if(fam)renderStrip()});
 const dupKey=w=>(AR.test(w)?translit(w):norm(w)).replace(/([a-z0-9])\1+/g,'$1');
 const findDup=w=>allWords().find(x=>dupKey(x.w)===dupKey(w));
 let aiOn=false;const rh={};
+/* ---------- rhyme finder ---------- */
+const fCache={};let fTimer=null,fLast='';
+function fSection(title,body){return '<div class="fsec"><h3>'+title+'</h3>'+body+'</div>'}
+function fChips(list,add){return '<div class="rchips">'+list.map(x=>add?'<button class="rc" data-fw="'+esc(x.w)+'" data-fg="'+esc(x.g||'')+'" title="Add to the word wall">+ '+esc(x.w)+(x.g?' <i>'+esc(x.g)+'</i>':'')+'</button>':'<span class="rc" dir="auto">'+esc(x.w)+(x.g?' <i>'+esc(x.g)+'</i>':'')+'</span>').join('')+'</div>'}
+function findLocal(q){
+  const e=ending(q),f=families(),me=dupKey(q);
+  const exact=(f[e]||[]).filter(x=>dupKey(x.w)!==me);
+  const tail=e.slice(-2),near=[];
+  if(tail.length===2)for(const k in f){if(k!==e&&k.endsWith(tail))near.push(...f[k].filter(x=>dupKey(x.w)!==me))}
+  return {e,exact,near:near.slice(0,16)};
+}
+function renderFinder(q,ai){
+  const out=$('fOut');if(!q){out.innerHTML='';return}
+  if(!VALID.test(q)){out.innerHTML=fSection('Type one word','<span class="muted">2 to 20 letters, Latin (with 3, 7, 9) or Arabic.</span>');return}
+  const {e,exact,near}=findLocal(q);
+  let h=fSection('Rhymes with <b>'+esc(q)+'</b> · sound -'+esc(e),exact.length?fChips(exact):'<span class="muted">No word on the wall ends in -'+esc(e)+' yet.</span>');
+  if(near.length)h+=fSection('Close rhymes (same last sound)',fChips(near));
+  if(aiOn){
+    h+=fSection('More ideas from AI',ai&&ai.loading?'<span class="muted">Thinking…</span>':ai&&ai.err?'<span class="muted">'+esc(ai.err)+'</span>':ai&&ai.items?(ai.items.length?fChips(ai.items,true)+'<p class="muted" style="margin:8px 0 0">Tap one to add it to the word wall.</p>':'<span class="muted">No new ideas this time.</span>'):'<span class="muted">Press Find for AI ideas.</span>');
+  }
+  out.innerHTML=h;
+}
+async function askAI(q){
+  const key=dupKey(q);if(fCache[key]&&!fCache[key].err){renderFinder(q,fCache[key]);return}
+  const lat=AR.test(q)?translit(q):q.toLowerCase();
+  const {e,exact}=findLocal(q);
+  const words=[lat,...exact.map(x=>AR.test(x.w)?translit(x.w):x.w)].filter(w=>/^[A-Za-z0-9]{2,20}$/.test(w)).slice(0,12);
+  if(!words.length){fCache[key]={err:'Try this word in Latin letters for AI ideas.'};renderFinder(q,fCache[key]);return}
+  fCache[key]={loading:true};renderFinder(q,fCache[key]);
+  try{const r=await fetch(AI_URL,{method:'POST',headers:sHdr(),body:JSON.stringify({sound:e,words})});const j=await r.json();if(!r.ok)throw new Error(j&&j.error||r.status);
+    fCache[key]={items:(Array.isArray(j.words)?j.words:[]).filter(x=>x&&VALID.test(String(x.w))&&!findDup(String(x.w))).map(x=>({w:String(x.w),g:String(x.g||'').slice(0,40)}))};
+  }catch(err){fCache[key]={err:String(err.message||err).includes('429')?'Too many requests — try again in a bit.':'AI is busy, try again.'}}
+  if($('fq').value.trim()===q)renderFinder(q,fCache[key]);
+}
+$('fq').addEventListener('input',()=>{const q=$('fq').value.trim();clearTimeout(fTimer);renderFinder(q,fCache[dupKey(q)]);
+  if(aiOn&&VALID.test(q))fTimer=setTimeout(()=>{if(q!==fLast){fLast=q;askAI(q)}},1100)});
+$('fForm').addEventListener('submit',e=>{e.preventDefault();const q=$('fq').value.trim();clearTimeout(fTimer);renderFinder(q,fCache[dupKey(q)]);if(aiOn&&VALID.test(q)){fLast=q;askAI(q)}});
+$('fOut').addEventListener('click',e=>{const b=e.target.closest('[data-fw]');if(!b)return;$('w').value=b.dataset.fw;$('g').value=b.dataset.fg||'';$('add').requestSubmit();
+  const q=$('fq').value.trim(),c=fCache[dupKey(q)];if(c&&c.items)c.items=c.items.filter(x=>x.w!==b.dataset.fw);
+  setTimeout(()=>renderFinder(q,c),400);
+  b.replaceWith(Object.assign(document.createElement('span'),{className:'rc',textContent:'✓ '+b.dataset.fw}))});
 function renderWall(){
   const recent=shared.slice(0,40);
   $('chips').innerHTML=recent.map(s=>'<span class="chip">'+esc(s.w)+(s.g?' <i>'+esc(s.g)+'</i>':'')+(isOwner&&s.id?'<button data-del="'+esc(s.id)+'" aria-label="Remove '+esc(s.w)+'">×</button>':'')+'</span>').join('');
@@ -701,6 +765,7 @@ const TOUR=[
  ['.seg','Free style or Challenge','Free style: just practice. Challenge: 16 words with a topic. Tap “Got it!” (or press G) each time you really use the word — build combos and get your rank at the end.'],
  [()=>$('play').parentElement,'Play and Skip','Play starts the beat and the words (or press Space). Skip word jumps to a new rhyme sound if you’re stuck.'],
  [()=>$('speed').closest('.side'),'Speed and settings','Speed makes the beat slower or faster. “New sound every” sets how many bars you keep the same rhyme sound. Level sets how fast words come: Easy every 2 bars, Normal every bar, Hard every 2 beats. Volume is the beat loudness.'],
+ ['.finder','Find a rhyme','Stuck? Type any word here and its rhymes show up right away — from the word wall, plus ideas from AI that you can add with one tap.'],
  ['#beats','Choose your beat','14 beats made right here — five kinds of Boom bap, Trap, Drill, Phonk, Mezoued, Stambeli and more. Tap one to switch.'],
  ['#yt','Your own beat or YouTube','Load an MP3, or search a beat on YouTube, play it there, tap the tempo and press “Use my YouTube beat”. “Sync on the 1” lines the words up with the music.'],
  ['#add','Zid kelma','Add Tunisian words in Arabic or Latin letters (3, 7, 9). They go on the word wall and into everyone’s freestyle.'],
@@ -740,7 +805,7 @@ renderWall();
 
 
 const localMode=typeof window.claude==='undefined'||!window.claude||typeof window.claude.use!=='function';
-if(localMode&&remote){fetch(AI_URL,{headers:sHdr()}).then(r=>r.ok?r.json():null).then(j=>{if(j&&j.ok){aiOn=true;renderWall()}}).catch(()=>{});readyFn();$('wallHint').textContent='Loading shared words…';loadRemote();setInterval(()=>{if(!document.hidden)loadRemote()},30000)}
+if(localMode&&remote){fetch(AI_URL,{headers:sHdr()}).then(r=>r.ok?r.json():null).then(j=>{if(j&&j.ok){aiOn=true;renderWall();const q=$('fq').value.trim();if(q)renderFinder(q,fCache[dupKey(q)])}}).catch(()=>{});readyFn();$('wallHint').textContent='Loading shared words…';loadRemote();setInterval(()=>{if(!document.hidden)loadRemote()},30000)}
 else if(localMode){
   readyFn();$('shareNote').textContent='Words you add are saved in this browser.';
   try{const a=JSON.parse(localStorage.getItem('ft-words')||'[]');if(Array.isArray(a))shared=a.filter(x=>x&&typeof x.w==='string'&&VALID.test(x.w)).map(x=>({w:x.w,g:typeof x.g==='string'?x.g.slice(0,40):'',at:+x.at||0}))}catch(e){}

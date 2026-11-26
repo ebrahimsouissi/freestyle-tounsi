@@ -13,6 +13,8 @@ A freestyle rap trainer in Tunisian Darija. Pick a beat, press play, and a new T
 - Shared word wall: words added on the live site are stored in Supabase and shown to everyone
 - Guided tour for new visitors
 
+- Find a rhyme: type any word to see its rhymes from the word wall, plus AI ideas (Supabase Edge Function `rhyme`)
+
 ## Run it
 It's a single `index.html` file — open it in a browser, or host it with GitHub Pages.
 
